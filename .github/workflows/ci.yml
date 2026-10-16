@@ -1,9 +1,11 @@
 name: CI
 
+# Started by hand (Actions → CI → Run workflow). To run it on every change, add the triggers
+#   push: { branches: [main] }
+#   pull_request:
+# Locally: eng/fetch-testdata.sh && dotnet test
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
