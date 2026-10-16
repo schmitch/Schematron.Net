@@ -1,0 +1,42 @@
+name: CI
+
+# Started by hand (Actions → CI → Run workflow). To run it on every change, add the triggers
+#   push: { branches: [main] }
+#   pull_request:
+# Locally: eng/fetch-testdata.sh && dotnet test
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: format, build, test, pack
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_NOLOGO: "1"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      # the upstream suites must be there: a failed download fails the tests instead of skipping them
+      SCHEMATRON_REQUIRE_TESTDATA: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+      # the downloads are pinned, so the lock file is the cache key
+      - uses: actions/cache@v4
+        with:
+          path: .testdata
+          key: testdata-${{ hashFiles('eng/testdata.lock') }}
+      - name: Fetch upstream test data
+        run: eng/fetch-testdata.sh
+      - name: Check formatting
+        run: dotnet format Schematron.Net.slnx --verify-no-changes
+      - name: Build
+        run: dotnet build Schematron.Net.slnx --configuration Release
+      - name: Test
+        run: dotnet test Schematron.Net.slnx --configuration Release --no-build --logger "console;verbosity=normal"
+      - name: Pack
+        run: dotnet pack Schematron.Net.slnx --configuration Release --no-build --output artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: artifacts/*.nupkg

@@ -1,0 +1,24 @@
+<Project>
+  <!-- Settings shared by every project. -->
+  <PropertyGroup>
+    <Authors>envisia GmbH</Authors>
+    <Company>envisia GmbH</Company>
+    <Product>Schematron.Net</Product>
+    <Copyright>Copyright © envisia GmbH</Copyright>
+    <Version>0.1.0</Version>
+
+    <RepositoryUrl>https://github.com/schmitch/Schematron.Net</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/schmitch/Schematron.Net</PackageProjectUrl>
+
+    <LangVersion>latest</LangVersion>
+    <Deterministic>true</Deterministic>
+    <NeutralLanguage>en</NeutralLanguage>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Reproducible builds on CI (SourceLink paths, deterministic output). -->
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+</Project>
