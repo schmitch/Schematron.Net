@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Order xmlns="urn:example:order">
+  <Note>Please deliver in the morning</Note>
+  <Line><Product>ABC-1</Product><Quantity>2</Quantity><Price>5.50</Price><Total>11.00</Total></Line>
+  <Line><Product>ABC-2</Product><Quantity>150</Quantity><Price>1</Price><Total>150</Total></Line>
+  <Line><Product>abc</Product><Quantity>1</Quantity><Price>2</Price><Total>3</Total></Line>
+  <Line><Product>ABC-1</Product><Quantity>1</Quantity><Price>1</Price><Total>1</Total></Line>
+</Order>

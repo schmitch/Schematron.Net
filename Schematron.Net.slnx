@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Schematron.Net.XPath/Schematron.Net.XPath.csproj" />
+    <Project Path="src/Schematron.Net/Schematron.Net.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Schematron.Net.XPath.Tests/Schematron.Net.XPath.Tests.csproj" />
+    <Project Path="tests/Schematron.Net.Tests/Schematron.Net.Tests.csproj" />
+  </Folder>
+</Solution>

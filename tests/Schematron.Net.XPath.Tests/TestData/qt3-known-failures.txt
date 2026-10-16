@@ -1,0 +1,421 @@
+# QT3 test cases that fail with this library (see Conformance/Qt3Tests.cs). One <test set>/<test case> per
+# line, followed by the reason. Generated with QT3_UPDATE_BASELINE=1; remove lines when a fix makes them pass.
+
+fn-avg/fn-avg-mix-args-021  # assert-eq -5.0E17 does not hold for (xs:double("-4.9999999999999994E17"))
+fn-avg/fn-avg-mix-args-023  # assert-eq -5.0E17 does not hold for (xs:double("-4.9999999999999994E17"))
+fn-avg/fn-avg-10  # error XPST0003 (XPST0003: Unexpected token [ at position 4 in expression "avg([1,2,3,4,5])"), expected assert-eq 3
+fn-avg/cbcl-avg-002  # expected error FODT0002, got (xs:dayTimeDuration("P4611686018427384259DT6H13M20S"))
+fn-boolean/boolean-010  # expected error FORG0006, got error XPST0003
+fn-boolean/boolean-010b  # expected error FORG0006, got error XPST0003
+fn-boolean/boolean-011  # expected error FORG0006, got error XPST0003
+fn-boolean/boolean-013  # expected error FORG0006, got error XPST0003
+fn-boolean/boolean-014  # expected error FORG0006, got error XPST0003
+fn-codepoints-to-string/K-CodepointToStringFunc-8  # expected error FOCH0001, got (xs:string("\u0008"))
+fn-codepoints-to-string/K-CodepointToStringFunc-11  # expected error FOCH0001, got (xs:string("\u000B"))
+fn-codepoints-to-string/K-CodepointToStringFunc-12  # expected error FOCH0001, got (xs:string("\u000C"))
+fn-codepoints-to-string/K-CodepointToStringFunc-24  # expected error FOCH0001, got (xs:string("￾"))
+fn-codepoints-to-string/K-CodepointToStringFunc-25  # expected error FOCH0001, got (xs:string("￿"))
+fn-codepoints-to-string/cbcl-codepoints-to-string-008  # expected error FOCH0001, got (xs:string("￿𐀀𐀁𐀂𐀃𐀄𐀅𐀆𐀇𐀈𐀉𐀊𐀋𐀌𐀍𐀎𐀏𐀐𐀑𐀒𐀓𐀔𐀕𐀖𐀗𐀘𐀙𐀚𐀛𐀜𐀝𐀞𐀟𐀠𐀡𐀢𐀣𐀤𐀥𐀦𐀧𐀨𐀩𐀪𐀫𐀬𐀭𐀮𐀯𐀰𐀱𐀲𐀳𐀴𐀵𐀶𐀷𐀸𐀹𐀺...
+fn-codepoints-to-string/cbcl-codepoints-to-string-009  # expected error FOCH0001, got (xs:string("￺￻￼�￾￿𐀀𐀁𐀂𐀃𐀄𐀅𐀆𐀇𐀈𐀉𐀊𐀋𐀌𐀍𐀎𐀏𐀐𐀑𐀒𐀓𐀔𐀕𐀖𐀗𐀘𐀙𐀚𐀛𐀜𐀝𐀞𐀟𐀠𐀡𐀢𐀣𐀤𐀥𐀦𐀧𐀨𐀩𐀪𐀫𐀬𐀭𐀮𐀯𐀰𐀱𐀲𐀳𐀴𐀵𐀶𐀷\uD800...
+fn-codepoints-to-string/cbcl-codepoints-to-string-023  # expected error FOCH0001, got (xs:string("\u0009"), xs:string("\u000A"), xs:string("\u000B"), xs:string("\u000C"), xs:string("\u000D"), ... 7 items)
+fn-codepoints-to-string/cbcl-codepoints-to-string-024  # expected error FOCH0001, got (xs:string("\u000D"), xs:string("\u000E"), xs:string("\u000F"))
+fn-compare/fn-compare-22  # expected error FOCH0002, got (xs:integer("0"))
+fn-compare/compare-008  # assert-eq 1 does not hold for (xs:integer("-1"))
+fn-compare/compare-009  # assert-eq 1 does not hold for (xs:integer("-1"))
+fn-compare/compare-017  # assert-eq 0 does not hold for (xs:integer("1"))
+fn-compare/compare-018  # assert-eq 0 does not hold for (xs:integer("1"))
+fn-compare/compare-020  # assert-eq -1 does not hold for (xs:integer("1"))
+fn-compare/compare-022  # assert-eq 0 does not hold for (xs:integer("1"))
+fn-compare/compare-025  # assert-eq -1 does not hold for (xs:integer("1"))
+fn-compare/compare-030  # assert-eq -1 does not hold for (xs:integer("1"))
+fn-compare/compare-036  # assert-eq 0 does not hold for (xs:integer("-1"))
+fn-contains/fn-contains-19  # assert-true  does not hold for (xs:boolean("false"))
+fn-contains/fn-contains-20  # assert-true  does not hold for (xs:boolean("false"))
+fn-contains/fn-contains-24  # assert-true  does not hold for (xs:boolean("false"))
+fn-contains/fn-contains-25  # assert-true  does not hold for (xs:boolean("false"))
+fn-contains/K-ContainsFunc-4  # expected error FOCH0002, got (xs:boolean("true"))
+fn-contains/liam-contains-001  # assert-string-value pass does not hold for (xs:string("huh"))
+fn-contains/liam-contains-002  # assert-string-value pass does not hold for (xs:string("huh"))
+fn-data/fn-data-2  # error XPST0003 (XPST0003: Unexpected token [ at position 5 in expression "data([])"), expected assert-empty 
+fn-data/fn-data-3  # error XPST0003 (XPST0003: Unexpected token [ at position 5 in expression "data([1,2,3])"), expected assert-deep-eq 1,2,3
+fn-data/fn-data-5  # error XPST0003 (XPST0003: Unexpected token [ at position 5 in expression "data([(1,2), (3,4), (5,6)])"), expected assert-deep-eq 1,2,3,4,5,6
+fn-data/fn-data-6  # error XPST0003 (XPST0003: Unexpected token [ at position 5 in expression "data([[1,2], [3,4], [5,6], []])"), expected assert-deep-eq 1,2,3,4,5,6
+fn-data/fn-data-7  # expected error FOTY0013, got error XPST0003
+fn-deep-equal/fn-deep-equal-arrays-1  # error XPST0003 (XPST0003: Unexpected token [ at position 14 in expression "fn:deep-equal([], [])"), expected assert-true 
+fn-deep-equal/fn-deep-equal-arrays-2  # error XPST0003 (XPST0003: Unexpected token [ at position 14 in expression "fn:deep-equal([1,2], [1,2])"), expected assert-true 
+fn-deep-equal/fn-deep-equal-arrays-3  # error XPST0003 (XPST0003: Unexpected token [ at position 14 in expression "fn:deep-equal([[]], [[]])"), expected assert-true 
+fn-deep-equal/fn-deep-equal-arrays-4  # error XPST0003 (XPST0003: Unexpected token [ at position 14 in expression "fn:deep-equal([], [1])"), expected assert-false 
+fn-deep-equal/fn-deep-equal-arrays-5  # error XPST0003 (XPST0003: Unexpected token [ at position 14 in expression "fn:deep-equal([1], 1)"), expected assert-false 
+fn-deep-equal/fn-deep-equal-arrays-6  # error XPST0003 (XPST0003: Unexpected token [ at position 14 in expression "fn:deep-equal([], [()])"), expected assert-false 
+fn-deep-equal/fn-deep-equal-arrays-7  # error XPST0003 (XPST0003: Unexpected token [ at position 14 in expression "fn:deep-equal([()], [()])"), expected assert-true 
+fn-deep-equal/fn-deep-equal-arrays-8  # error XPST0003 (XPST0003: Unexpected token [ at position 14 in expression "fn:deep-equal([map{}], [map{}])"), expected assert-true 
+fn-deep-equal/fn-deep-equal-arrays-9  # error XPST0003 (XPST0003: Unexpected token [ at position 14 in expression "fn:deep-equal([map{1:1, 2:2}], [map{2:2, 1:1}])"), expected assert-true 
+fn-deep-equal/fn-deep-equal-arrays-11  # error XPST0003 (XPST0003: Unexpected token [ at position 14 in expression "fn:deep-equal([['a', 'b', 'c']], [['a', 'b', 'c']])"), expected assert-true 
+fn-deep-equal/fn-deep-equal-arrays-12  # error XPST0003 (XPST0003: Unexpected token [ at position 14 in expression "fn:deep-equal([['a', 'b', 'c']], [['A', 'B', 'C']])"), expected assert-false 
+fn-deep-equal/fn-deep-equal-arrays-14  # error XPST0003 (XPST0003: Unexpected token [ at position 15 in expression "fn:deep-equal(([['a', 'b', 'c']], [], [1]), ([['a', 'b', 'c']], [], [1]))"), expected...
+fn-deep-equal/fn-deep-equal-arrays-15  # error XPST0003 (XPST0003: Unexpected token [ at position 15 in expression "fn:deep-equal(([['a', 'b', 'c']], [], [1]), ([['a', 'b', 'c']], [], [1], []))"), expe...
+fn-deep-equal/fn-deep-equal-arrays-16  # error XPST0003 (XPST0003: Unexpected token [ at position 15 in expression "fn:deep-equal(([['a', 'b', 'c']], [], [1]), ([['a', 'b', 'c']], [], [2]))"), expected...
+fn-deep-equal/fn-deep-equal-arrays-17  # error XPST0003 (XPST0003: Unexpected token [ at position 15 in expression "fn:deep-equal(([['a', 'b', 'c']], [], [1]), ([['a', 'b', 'c', 'd']], [], [1]))"), exp...
+fn-deep-equal/fn-deep-equal-arrays-18  # error XPST0003 (XPST0003: Unexpected token [ at position 15 in expression "fn:deep-equal(([['a', 'b', 'd'] => array:put(3, 'c')], [], [1]), ([['a', 'b', 'c', 'd...
+fn-deep-equal/fn-deep-equal-maps-1  # error XPST0003 (XPST0003: Expected ')' but found { at position 17 in expression "fn:deep-equal(map{}, map{})"), expected assert-true 
+fn-deep-equal/fn-deep-equal-maps-2  # error XPST0003 (XPST0003: Expected ')' but found { at position 17 in expression "fn:deep-equal(map{1:2}, map{})"), expected assert-false 
+fn-deep-equal/fn-deep-equal-maps-3  # error XPST0003 (XPST0003: Expected ')' but found { at position 17 in expression "fn:deep-equal(map{}, map{1:()})"), expected assert-false 
+fn-deep-equal/fn-deep-equal-maps-4  # error XPST0003 (XPST0003: Expected ')' but found { at position 17 in expression "fn:deep-equal(map{1:true(), 2:false()}, map{2:false(), 1:true()})"), expected a...
+fn-deep-equal/fn-deep-equal-maps-5  # error XPST0003 (XPST0003: Expected ')' but found { at position 17 in expression "fn:deep-equal(map{1:true()}, map{1.0:true()})"), expected assert-true 
+fn-deep-equal/fn-deep-equal-maps-6  # error XPST0003 (XPST0003: Expected ')' but found { at position 17 in expression "fn:deep-equal(map{1:true()}, map{1.0e0:true()})"), expected assert-true 
+fn-deep-equal/fn-deep-equal-maps-7  # error XPST0003 (XPST0003: Expected ')' but found { at position 17 in expression "fn:deep-equal(map{xs:double('NaN'):true()}, map{xs:double('NaN'):true()})"), ex...
+fn-deep-equal/fn-deep-equal-maps-8  # error XPST0003 (XPST0003: Expected ')' but found { at position 17 in expression "fn:deep-equal(map{xs:double('NaN'):true()}, map{xs:float('NaN'):true()})"), exp...
+fn-deep-equal/fn-deep-equal-maps-9  # error XPST0003 (XPST0003: Expected ')' but found { at position 17 in expression "fn:deep-equal(map{12:[1,2,3]}, map{12.0:[1.0, 2.0, 3.0]})"), expected assert-tr...
+fn-deep-equal/fn-deep-equal-maps-10  # error XPST0003 (XPST0003: Expected ')' but found { at position 17 in expression "fn:deep-equal(map{12:[1,2,3]}, map{12:[3,2,1]})"), expected assert-false 
+fn-deep-equal/fn-deep-equal-maps-13  # error XPST0003 (XPST0003: Expected ')' but found { at position 26 in expression "\u000A        fn:deep-equal(map{"a":1}, map{"A":1}, \u000A            'http://www.w3.org/...
+fn-deep-equal/fn-deep-equal-maps-14  # error XPST0003 (XPST0003: Expected ')' but found { at position 26 in expression "\u000A        fn:deep-equal(map{1:"a"}, map{1:"A"}, \u000A            'http://www.w3.org/...
+fn-deep-equal/fn-deep-equal-maps-15  # error XPST0003 (XPST0003: Expected ')' but found { at position 26 in expression "\u000A        fn:deep-equal(map{1:"A"}, map:remove(map{1:"A", 2:"B"}, 2))\u000A      "), ...
+fn-deep-equal/fn-deep-equal-maps-16  # error XPST0017 (XPST0017: Unknown function adjust-dateTime-to-timezone#2 in expression "\u000A        let $t := xs:dateTime('2014-10-14T11:31:12') return\u000A        let...
+fn-deep-equal/fn-deep-equal-maps-17  # error XPST0017 (XPST0017: Unknown function adjust-dateTime-to-timezone#2 in expression "\u000A        let $t := xs:dateTime('2014-10-14T11:31:12') return\u000A        let...
+fn-distinct-values/fn-distinct-values-mixed-args-005  # assert-permutation 1, 0 does not hold for (xs:double("0"), xs:integer("1"))
+fn-distinct-values/fn-distinct-values-mixed-args-012  # assert-string-value 1.2 does not hold for (xs:decimal("1.2"), xs:float("1.2"))
+fn-distinct-values/K2-SeqDistinctValuesFunc-1  # expected error FOCH0002, got (xs:string("1"), xs:string("2"), xs:string("3"))
+fn-distinct-values/cbcl-distinct-values-003  # error XPST0017 (XPST0017: Unknown function adjust-dateTime-to-timezone#1 in expression "distinct-values(\u000A              (xs:dateTime("2008-01-01T13:00:00"),\u000A    ...
+fn-ends-with/fn-ends-with-19  # assert-true  does not hold for (xs:boolean("false"))
+fn-ends-with/fn-ends-with-20  # assert-true  does not hold for (xs:boolean("false"))
+fn-ends-with/fn-ends-with-24  # assert-true  does not hold for (xs:boolean("false"))
+fn-ends-with/fn-ends-with-25  # assert-true  does not hold for (xs:boolean("false"))
+fn-ends-with/K-EndsWithFunc-4  # expected error FOCH0002, got (xs:boolean("true"))
+fn-index-of/K-SeqIndexOfFunc-4  # expected error FOCH0002, got (xs:integer("1"))
+fn-local-name/fn-local-name-2  # expected error XPTY0004, got error XPTY0020
+fn-lower-case/fn-lower-case-21  # assert-deep-eq 105, 775 does not hold for (xs:integer("304"))
+fn-matches/fn-matchesErr-4  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches/fn-matchesErr-5  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches/fn-matches-26  # assert-false  does not hold for (xs:boolean("true"))
+fn-matches/fn-matches-29  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches/fn-matches-37  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches/fn-matches-38  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches/fn-matches-39  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches/fn-matches-40  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches/caselessmatch14  # assert-false  does not hold for (xs:boolean("true"))
+fn-matches/caselessmatch15  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches/K2-MatchesFunc-1  # error FORX0002 (FORX0002: Invalid regular expression 'hello\ sworld': invalid escape \ ), expected assert-true 
+fn-matches/K2-MatchesFunc-5  # error FORX0002 (FORX0002: Invalid regular expression '\p{ IsBasicLatin}+': Invalid pattern '\p{ IsBasicLatin}+' at offset 4. Incomplete \p{X} character escape.)...
+fn-matches/K2-MatchesFunc-6  # error FORX0002 (FORX0002: Invalid regular expression '\p{ I s B a s i c L a t i n }+': Invalid pattern '\p{ I s B a s i c L a t i n }+' at offset 4. Incomplete ...
+fn-matches/cbcl-matches-039  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00032  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00072  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00096  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00140  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00141  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00144  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00145  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00146  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00147  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00149  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00150  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00151  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00152  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00165  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00169  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00172  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00173  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00288a  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsSupplementaryPrivateUseArea-A}+)$': Invalid pattern '^(?:\p{IsSupplementaryPrivateUseArea-A}+)\z'...
+fn-matches.re/re00288b  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsSupplementaryPrivateUseArea-B}+)$': Invalid pattern '^(?:\p{IsSupplementaryPrivateUseArea-B}+)\z'...
+fn-matches.re/re00379  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsOldItalic}?)$': Invalid pattern '^(?:\p{IsOldItalic}?)\z' at offset 19. Unknown property 'IsOldIt...
+fn-matches.re/re00380  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsGothic}?)$': Invalid pattern '^(?:\p{IsGothic}?)\z' at offset 16. Unknown property 'IsGothic'.), ...
+fn-matches.re/re00381  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsDeseret}?)$': Invalid pattern '^(?:\p{IsDeseret}?)\z' at offset 17. Unknown property 'IsDeseret'....
+fn-matches.re/re00382  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsByzantineMusicalSymbols}?)$': Invalid pattern '^(?:\p{IsByzantineMusicalSymbols}?)\z' at offset 3...
+fn-matches.re/re00383  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsMusicalSymbols}?)$': Invalid pattern '^(?:\p{IsMusicalSymbols}?)\z' at offset 24. Unknown propert...
+fn-matches.re/re00384  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsMathematicalAlphanumericSymbols}?)$': Invalid pattern '^(?:\p{IsMathematicalAlphanumericSymbols}?...
+fn-matches.re/re00385  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsCJKUnifiedIdeographsExtensionB}?)$': Invalid pattern '^(?:\p{IsCJKUnifiedIdeographsExtensionB}?)\...
+fn-matches.re/re00386  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsCJKCompatibilityIdeographsSupplement}?)$': Invalid pattern '^(?:\p{IsCJKCompatibilityIdeographsSu...
+fn-matches.re/re00387  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsTags}?)$': Invalid pattern '^(?:\p{IsTags}?)\z' at offset 14. Unknown property 'IsTags'.), expect...
+fn-matches.re/re00471  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsOldItalic})$': Invalid pattern '^(?:\p{IsOldItalic})\z' at offset 19. Unknown property 'IsOldItal...
+fn-matches.re/re00472  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsGothic})$': Invalid pattern '^(?:\p{IsGothic})\z' at offset 16. Unknown property 'IsGothic'.), ex...
+fn-matches.re/re00473  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsDeseret})$': Invalid pattern '^(?:\p{IsDeseret})\z' at offset 17. Unknown property 'IsDeseret'.),...
+fn-matches.re/re00474  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsByzantineMusicalSymbols})$': Invalid pattern '^(?:\p{IsByzantineMusicalSymbols})\z' at offset 33....
+fn-matches.re/re00475  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsMusicalSymbols})$': Invalid pattern '^(?:\p{IsMusicalSymbols})\z' at offset 24. Unknown property ...
+fn-matches.re/re00476  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsMathematicalAlphanumericSymbols})$': Invalid pattern '^(?:\p{IsMathematicalAlphanumericSymbols})\...
+fn-matches.re/re00477  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsCJKUnifiedIdeographsExtensionB})$': Invalid pattern '^(?:\p{IsCJKUnifiedIdeographsExtensionB})\z'...
+fn-matches.re/re00478  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsCJKCompatibilityIdeographsSupplement})$': Invalid pattern '^(?:\p{IsCJKCompatibilityIdeographsSup...
+fn-matches.re/re00479  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsTags})$': Invalid pattern '^(?:\p{IsTags})\z' at offset 14. Unknown property 'IsTags'.), expected...
+fn-matches.re/re00480  # error FORX0002 (FORX0002: Invalid regular expression '^(?:\p{IsSupplementaryPrivateUseArea-A})$': Invalid pattern '^(?:\p{IsSupplementaryPrivateUseArea-A})\z' a...
+fn-matches.re/re00503  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00504  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00521  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00567  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00568  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00569  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00572  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00574  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00613  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00615  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00616  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00618  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00619  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00620  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00621  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00623  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00624  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00625  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00626  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00743  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00744  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00745  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00746  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00750  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00751  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00754  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00756  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00757  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00761  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00762  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00763  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00764  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00765  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00767  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00768  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00769  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00785  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00791  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00804  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00805  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00806  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00820  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00821  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00822  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00827  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00828  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00829  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00830  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00867  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00868  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00869  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00870  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00871  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00872  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00873  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00874  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00875  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00876  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00879  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00881  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00882  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00884  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00885  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00886  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00887  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00888  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00889  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00890  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00891  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00892  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00893  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00894  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00895  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00896  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00897  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00898  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00903  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00904  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00905  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00906  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00907  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00908  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00910  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00911  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00912  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00913  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00914  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00919  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00920  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00921  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00922  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00923  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00924  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00925  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00926  # expected error FORX0002, got (xs:boolean("true"))
+fn-matches.re/re00927  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00928  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00929  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00930  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00931  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00937  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00938  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00939  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00940  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00941  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00958  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00959  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00960  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00961  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00962  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00963  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00964  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00965  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00966  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00967  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00968  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00969  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00970  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00977  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00978  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00988  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00989  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00993  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00994  # assert-true  does not hold for (xs:boolean("false"))
+fn-matches.re/re00996  # expected error FORX0002, got (xs:boolean("false"))
+fn-matches.re/re00997  # expected error FORX0002, got (xs:boolean("false"))
+fn-max/K-SeqMAXFunc-21  # expected error FORG0006, got (xs:float("NaN"))
+fn-max/K-SeqMAXFunc-38  # expected error FORG0006, got (xs:QName("ncname"))
+fn-max/K2-SeqMAXFunc-4  # expected error FOCH0002, got (xs:string("str2"))
+fn-max/fn-max-9  # expected error FORG0006, got (xs:duration("P1Y1M1D"))
+fn-max/fn-max-17  # assert-type xs:anyURI does not hold for (xs:string("http://b.com"))
+fn-max/fn-max-19  # error XPST0003 (XPST0003: Unexpected token [ at position 4 in expression "max([1,2,3,4,5])"), expected assert-eq 5
+fn-min/K-SeqMINFunc-21  # expected error FORG0006, got (xs:float("NaN"))
+fn-min/K-SeqMINFunc-38  # expected error FORG0006, got (xs:QName("ncname"))
+fn-min/K2-SeqMINFunc-4  # expected error FOCH0002, got (xs:string("str1"))
+fn-min/fn-min-9  # expected error FORG0006, got (xs:duration("P1Y1M1D"))
+fn-min/fn-min-17  # assert-type xs:anyURI does not hold for (xs:string("http://a.com"))
+fn-min/fn-min-19  # error XPST0003 (XPST0003: Unexpected token [ at position 4 in expression "min([1,2,3,4,5])"), expected assert-eq 1
+fn-namespace-uri/fn-namespace-uri-3  # expected error XPTY0004, got error XPTY0020
+fn-node-name/fn-node-name-30  # expected error XPTY0004, got error XPTY0020
+fn-number/fn-numberintg1args-1  # assert-string-value -1.0E18 does not hold for (xs:double("-9.999999999999999E17"))
+fn-number/fn-numberintg1args-3  # assert-string-value 1.0E18 does not hold for (xs:double("9.999999999999999E17"))
+fn-number/fn-numberlng1args-1  # assert-string-value -9.223372036854776E16 does not hold for (xs:double("-9.223372036854774E16"))
+fn-number/fn-numberlng1args-3  # assert-string-value 9.223372036854776E16 does not hold for (xs:double("9.223372036854774E16"))
+fn-number/fn-numbernint1args-1  # assert-string-value -1.0E18 does not hold for (xs:double("-9.999999999999999E17"))
+fn-number/fn-numberpint1args-3  # assert-string-value 1.0E18 does not hold for (xs:double("9.999999999999999E17"))
+fn-number/fn-numberulng1args-2  # assert-string-value 1.3074710860767466E17 does not hold for (xs:double("1.3074710860767464E17"))
+fn-number/fn-numberulng1args-3  # assert-true  does not hold for (xs:boolean("false"))
+fn-number/fn-numbernpi1args-1  # assert-string-value -1.0E18 does not hold for (xs:double("-9.999999999999999E17"))
+fn-number/fn-numbernni1args-3  # assert-string-value 1.0E18 does not hold for (xs:double("9.999999999999999E17"))
+fn-replace/fn-replace-34  # assert-string-value $1br$1c$1d$1br$1 does not hold for (xs:string("brcdbr"))
+fn-replace/fn-replace-35  # assert-string-value \$1bracadabr\$1 does not hold for (xs:string("$1bracadabr$1"))
+fn-replace/fn-replace-49  # error FORX0004 (FORX0004: Invalid replacement string '\'), expected assert-string-value a\b\c
+fn-replace/fn-replace-50  # assert-string-value a\\b\\c does not hold for (xs:string("a\b\c"))
+fn-replace/fn-replace-51  # error FORX0004 (FORX0004: Invalid replacement string '$'), expected assert-string-value a$b$c
+fn-replace/fn-replace-52  # error FORX0004 (FORX0004: Invalid replacement string '$''), expected assert-string-value a$'b$'c
+fn-replace/fn-replace-53  # error FORX0004 (FORX0004: Invalid replacement string '$`'), expected assert-string-value a$`b$`c
+fn-replace/fn-replace-58  # error FORX0002 (FORX0002: Invalid regular expression '\p{IsEmoticons}+': Invalid pattern '\p{IsEmoticons}+' at offset 15. Unknown property 'IsEmoticons'.), expe...
+fn-replace/K2-ReplaceFunc-3  # expected error FORX0002, got (xs:string("abcd"))
+fn-root/fn-root-2  # error XPTY0020 (XPTY0020: The context item is not a node), expected assert-count 100
+fn-root/K-NodeRootFunc-2  # expected error XPTY0004, got error XPTY0020
+fn-round-half-to-even/cbcl-round-half-to-even-001  # driver/engine exception OverflowException: Value was either too large or too small for an Int32.
+fn-round-half-to-even/cbcl-round-half-to-even-012  # driver/engine exception OverflowException: Value was either too large or too small for an Int32.
+fn-starts-with/fn-starts-with-19  # assert-true  does not hold for (xs:boolean("false"))
+fn-starts-with/fn-starts-with-20  # assert-true  does not hold for (xs:boolean("false"))
+fn-starts-with/fn-starts-with-24  # assert-true  does not hold for (xs:boolean("false"))
+fn-starts-with/fn-starts-with-25  # assert-true  does not hold for (xs:boolean("false"))
+fn-starts-with/fn-starts-with-34  # assert-true  does not hold for (xs:boolean("false"))
+fn-starts-with/K-StartsWithFunc-4  # expected error FOCH0002, got (xs:boolean("true"))
+fn-string/fn-string-32  # expected error FOTY0014, got error XPST0003
+fn-string/fn-string-33  # expected error FOTY0014, got error XPST0003
+fn-string/fn-string-34  # expected error FOTY0014, got error XPST0003
+fn-string/fn-string-35  # expected error FOTY0014, got error XPST0003
+fn-string/fn-string-36  # expected error FOTY0014, got error XPST0017
+fn-string/fn-string-37  # expected error FOTY0014, got error XPST0003
+fn-string/fn-string-38  # expected error FOTY0014, got error XPST0003
+fn-substring-after/fn-substring-after-29  # assert-eq "base" does not hold for (xs:string(""))
+fn-substring-after/fn-substring-after-30  # assert-eq "e" does not hold for (xs:string(""))
+fn-substring-after/fn-substring-after-34  # assert-eq "base" does not hold for (xs:string(""))
+fn-substring-after/fn-substring-after-35  # assert-eq "e" does not hold for (xs:string(""))
+fn-substring-after/K-SubstringAfterFunc-4  # expected error FOCH0002, got (xs:string(""))
+fn-substring-before/fn-substring-before-29  # assert-eq "data" does not hold for (xs:string(""))
+fn-substring-before/fn-substring-before-30  # assert-eq "da" does not hold for (xs:string(""))
+fn-substring-before/fn-substring-before-34  # assert-eq "data" does not hold for (xs:string(""))
+fn-substring-before/fn-substring-before-35  # assert-eq "da" does not hold for (xs:string(""))
+fn-substring-before/fn-substring-before-37  # assert-eq "dâta" does not hold for (xs:string(""))
+fn-substring-before/K-SubstringBeforeFunc-4  # expected error FOCH0002, got (xs:string(""))
+fn-sum/fn-sum-11  # error XPST0003 (XPST0003: Unexpected token [ at position 4 in expression "sum([1,2,3,4,5])"), expected assert-eq 15
+fn-upper-case/fn-upper-case-22  # assert-deep-eq 1348, 1341 does not hold for (xs:integer("64279"))
+op-numeric-divide/K-NumericDivide-37  # expected error XPST0003, got (xs:decimal("3.333333333333333333"))
+op-numeric-integer-divide/K-NumericIntegerDivide-43  # expected error XPST0003, got (xs:integer("3"))
+op-numeric-mod/K-NumericMod-22  # expected error XPST0003, got (xs:integer("1"))
+op-string-less-than/K2-StringLT-1  # assert-true  does not hold for (xs:boolean("false"))
+op-date-equal/cbcl-date-eq-001  # expected error FODT0001, got error FORG0001
+op-date-equal/cbcl-date-ne-001  # expected error FODT0001, got error FORG0001
+op-date-less-than/cbcl-date-ge-001  # expected error FODT0001, got error FORG0001
+op-date-greater-than/cbcl-date-gt-001  # expected error FODT0001, got error FORG0001
+op-subtract-dates/cbcl-subtract-dates-001  # expected error FODT0001, got error FORG0001
+op-subtract-dates/cbcl-subtract-dates-002  # expected error FODT0001, got error FORG0001
+op-to/RangeExpr-409c  # error XPDY0130 (XPDY0130: Range expression is too large), expected assert-true 
+op-to/RangeExpr-409d  # error XPDY0130 (XPDY0130: Range expression is too large), expected assert-true 
+op-union/fn-union-node-args-003  # assert $result[1][self::document-node()][bib/book[1]/@year = "1994"] does not hold for (node("\u000A    \u000A        TCP/IP Illustrated\u000A       ..."), node("Data on the W...
+prod-AxisStep/Axes113  # assert-count 1 does not hold for ()
+prod-AxisStep/Axes123  # assert-true  does not hold for (xs:boolean("false"))
+prod-AxisStep/Axes124  # assert-eq 'http://example.com/default-ns' does not hold for (node("http://example.com/default-ns"))
+prod-CastableExpr/CastableAs647  # assert-true  does not hold for (xs:boolean("false"))
+prod-CastableExpr/CastableAs648a  # assert-true  does not hold for (xs:boolean("false"))
+prod-CastableExpr/CastableAs664  # error XPST0003 (XPST0003: Unexpected token [ at position 10 in expression "\u000A         [1,2,3,4,5] castable as xs:integer\u000A      "), expected assert-false 
+prod-CastableExpr/K-SeqExprCastable-19  # assert-true  does not hold for (xs:boolean("false"))
+prod-CastableExpr/cbcl-castable-decimal-007  # error FOCA0001 (FOCA0001: Value 1.7976931348623157E+308 is too large for xs:decimal), expected assert-false 
+prod-CastableExpr/cbcl-castable-decimal-008  # error FOCA0001 (FOCA0001: Value -1.7976931348623157E+308 is too large for xs:decimal), expected assert-false 
+prod-CastableExpr/cbcl-castable-decimal-009  # error FOCA0001 (FOCA0001: Value 3.4028230607370965E+38 is too large for xs:decimal), expected assert-false 
+prod-CastableExpr/cbcl-castable-decimal-010  # error FOCA0001 (FOCA0001: Value -3.4028230607370965E+38 is too large for xs:decimal), expected assert-false 
+prod-CastExpr/CastAs673b  # error XPTY0004 (XPTY0004: Cannot convert xs:string "ABC" to xs:QName), expected assert-string-value ABC
+prod-CastExpr/K-SeqExprCast-71b  # error XPTY0004 (XPTY0004: Cannot convert xs:untypedAtomic "ncname" to xs:QName), expected assert-string-value ncname
+prod-CastExpr/K-SeqExprCast-129  # expected error FORG0001, got (xs:base64Binary("frfhforlksid74532w=="))
+prod-CastExpr/K-SeqExprCast-422a  # expected error FORG0001, got error XPTY0004
+prod-CastExpr/K-SeqExprCast-1421  # expected error FORG0001, got (xs:QName(""))
+prod-CastExpr/K2-SeqExprCast-1  # error XPTY0004 (XPTY0004: Cannot convert xs:string "myPrefix:ncname" to xs:QName), expected assert-true 
+prod-CastExpr/K2-SeqExprCast-201  # assert-string-value http://example.com/defelementns does not hold for (xs:anyURI(""))
+prod-EQName/eqname-024  # error XPST0008 (XPST0008: Variable ${urn:foo   bar}x has not been declared), expected assert-string-value 2 4 6 8 10
+prod-EQName/eqname-033  # error XPST0008 (XPST0008: Variable ${foo   bar}a has not been declared), expected assert-eq 25
+prod-EQName/eqname-906  # expected error XPST0003, got error XPST0017
+prod-EQName/eqname-910  # expected error XQST0070, got ()
+prod-EQName/eqname-913  # expected error XQST0039, got error XPST0003
+prod-FunctionCall/FunctionCall-011  # error XPST0017 (XPST0017: Unknown function xs:NMTOKENS#1 in expression "codepoints-to-string(xs:NMTOKENS('48 49 50 51')!xs:untypedAtomic(.))"), expected assert-...
+prod-FunctionCall/FunctionCall-012  # expected error XPTY0004, got error XPST0017
+prod-FunctionCall/FunctionCall-027  # expected error XPST0051, got error XPST0003
+prod-FunctionCall/K-FunctionCallExpr-11  # expected error XPST0017, got error FODC0002
+prod-FunctionCall/K-FunctionCallExpr-14  # expected error XPST0017, got error XTDE1260
+prod-FunctionCall/K-FunctionCallExpr-16a  # error XPST0017 (XPST0017: Unknown function format-time#2 in expression "matches(format-time(current-time(), "[H01]:[m01]"), "[0-2][0-9]:[0-5][0-9]")"), expected...
+prod-FunctionCall/K-FunctionCallExpr-17a  # error XPST0017 (XPST0017: Unknown function format-time#5 in expression "matches(format-time(current-time(), "[H01]:[m01]", (), (), ()), "..:..")"), expected ass...
+prod-FunctionCall/K-FunctionCallExpr-22  # expected error XPST0017, got error XTDE1360
+prod-FunctionCall/K-FunctionCallExpr-26  # expected error XPST0017, got (xs:string("envisia GmbH"))
+prod-FunctionCall/K2-FunctionCallExpr-3  # expected error XPST0017, got error XTDE1360
+prod-FunctionCall/K2-FunctionCallExpr-8  # expected error XPST0017, got (xs:string(""))
+prod-FunctionCall/function-call-reserved-function-names-029  # expected error XPST0003, got error XPDY0002
+prod-FunctionCall/function-call-reserved-function-names-030  # expected error XPST0003, got error XPDY0002
+prod-GeneralComp.eq/GenCompEq-7  # error XPST0003 (XPST0003: Unexpected token [ at position 0 in expression "[3, 4, 5] = 4"), expected assert-true 
+prod-GeneralComp.eq/GenCompEq-8  # error XPST0003 (XPST0003: Unexpected token [ at position 0 in expression "[[3, 4], 5] = [4, [5, 6]]"), expected assert-true 
+prod-GeneralComp.eq/GenCompEq-9  # error XPST0003 (XPST0003: Unexpected token [ at position 0 in expression "[3, 4, 5] = []"), expected assert-false 
+prod-GeneralComp.lt/GenCompLT-9  # error XPST0003 (XPST0003: Unexpected token [ at position 0 in expression "[3, 4, 5] < 4"), expected assert-true 
+prod-GeneralComp.lt/GenCompLT-10  # error XPST0003 (XPST0003: Unexpected token [ at position 0 in expression "[[3, 4], 5] < [4, [5, 6]]"), expected assert-true 
+prod-GeneralComp.lt/GenCompLT-11  # error XPST0003 (XPST0003: Unexpected token [ at position 0 in expression "[3, 4, 5] < []"), expected assert-false 
+prod-IfExpr/CondExpr017  # assert $result[1][. instance of element(FileName)][. = 'File00000000000'] does not hold for (node("File00000000000"), xs:untypedAtomic("File00000000001"), xs:un...
+prod-NameTest/K2-NameTest-37  # expected error XPST0008, got error XPDY0002
+prod-NameTest/K2-NameTest-38  # expected error XPST0008, got error XPDY0002
+prod-NodeTest/K2-NodeTest-8  # expected error XPST0003, got error XPDY0002
+prod-NodeTest/K2-NodeTest-9  # expected error XPST0003, got error XPDY0002
+prod-NodeTest/K2-NodeTest-10  # expected error XPST0017, got error XPDY0002
+prod-NodeTest/K2-NodeTest-12  # expected error XPST0003, got error XPST0051
+prod-NodeTest/K2-NodeTest-13  # expected error XPST0003, got error XPST0051
+prod-NodeTest/K2-NodeTest-16  # expected error XPST0003, got error XPDY0002
+prod-NodeTest/K2-NodeTest-18  # expected error XPST0003, got error XPDY0002
+prod-NodeTest/K2-NodeTest-19  # expected error XPST0008, got error XPDY0002
+prod-PathExpr/PathExpr-17  # error XPST0003 (XPST0003: Unexpected token [ at position 1 in expression "/[bid, bid]"), expected assert-type array(element(bid))
+prod-PathExpr/PathExpr-19  # error XPST0003 (XPST0003: Unexpected token { at position 6 in expression "/array{bid, bid}"), expected assert-type array(element(bid))
+prod-ValueComp/value-comparison-5  # error XPST0003 (XPST0003: Unexpected token [ at position 0 in expression "[3] eq 3"), expected assert-true 
+prod-ValueComp/value-comparison-6  # error XPST0003 (XPST0003: Unexpected token [ at position 0 in expression "[3] le [3]"), expected assert-true 
+prod-ValueComp/value-comparison-7  # error XPST0003 (XPST0003: Unexpected token [ at position 0 in expression "[] eq 3"), expected assert-empty 
+prod-ValueComp/value-comparison-8  # expected error XPTY0004, got error XPST0003
+prod-ValueComp/value-comparison-9  # error XPST0003 (XPST0003: Unexpected token [ at position 0 in expression "[] eq ()"), expected assert-empty 
+prod-ValueComp/value-comparison-10  # error XPST0003 (XPST0003: Unexpected token { at position 3 in expression "map{} eq ()"), expected assert-empty 
+prod-ValueComp/value-comparison-11  # expected error FOTY0013, got error XPST0003
+prod-LetClause/LetExpr020a  # expected error XPST0003, got (xs:integer("2"))
+xs-numeric/xs-numeric-001  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "3.14e0 instance of xs:numeric"), expected assert-true 
+xs-numeric/xs-numeric-002  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "3.14 instance of xs:numeric"), expected assert-true 
+xs-numeric/xs-numeric-003  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "3 instance of xs:numeric"), expected assert-true 
+xs-numeric/xs-numeric-004  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "xs:float('93.7') instance of xs:numeric"), expected assert-true 
+xs-numeric/xs-numeric-005  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "xs:nonNegativeInteger('93') instance of xs:numeric"), expected assert-true 
+xs-numeric/xs-numeric-006  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "\u000A        let $x := if (current-date() lt xs:date('2500-01-01')) then -3 else 'minus thre...
+xs-numeric/xs-numeric-007  # error XPST0017 (XPST0017: Unknown function xs:numeric#1 in expression "xs:numeric('12') instance of xs:double"), expected assert-true 
+xs-numeric/xs-numeric-008  # error XPST0017 (XPST0017: Unknown function xs:numeric#1 in expression "xs:numeric('12.5') instance of xs:double"), expected assert-true 
+xs-numeric/xs-numeric-009  # error XPST0017 (XPST0017: Unknown function xs:numeric#1 in expression "xs:numeric('12.5e2') instance of xs:double"), expected assert-true 
+xs-numeric/xs-numeric-010  # expected error FORG0001, got error XPST0017
+xs-numeric/xs-numeric-011  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "'12.5' castable as xs:numeric"), expected assert-true 
+xs-numeric/xs-numeric-012  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "'12.5.7' castable as xs:numeric"), expected assert-false 
+xs-numeric/xs-numeric-013  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "17 cast as xs:numeric"), expected assert-eq 17
+xs-numeric/xs-numeric-014  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "17.2 cast as xs:numeric"), expected assert-eq 17.2
+xs-numeric/xs-numeric-015  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "1e3 cast as xs:numeric"), expected assert-eq 1e3
+xs-numeric/xs-numeric-016  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "xs:float(1e3) cast as xs:numeric"), expected assert-eq xs:float(1e3)
+xs-numeric/xs-numeric-017  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "xs:short(256) cast as xs:numeric"), expected assert-eq 256
+xs-numeric/xs-numeric-018  # error XPST0051 (XPST0051: Unknown atomic type xs:numeric in expression "true() cast as xs:numeric"), expected assert-eq 1e0

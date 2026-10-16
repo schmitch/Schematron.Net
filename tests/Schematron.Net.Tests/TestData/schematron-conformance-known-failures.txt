@@ -1,0 +1,36 @@
+# Schematron conformance test cases (Schematron/schematron-conformance) that fail with this library; see
+# Conformance/SchematronConformanceTests.cs. None of these features is used by the EN 16931, XRechnung, Peppol or
+# Factur-X rules. Remove a line when a fix makes the test case pass.
+
+# sch:extends/@href (ISO 2016) is not supported
+core/extends-baseuri-fixup-01.xml
+core/extends-recursive-01.xml
+
+# static checks that are not implemented: duplicate variable names, references to undefined variables
+core/let-name-collision-error-01.xml
+core/let-name-collision-error-02.xml
+core/let-name-collision-error-03.xml
+core/let-name-collision-error-04.xml
+core/let-name-collision-error-05.xml
+core/let-name-collision-error-06.xml
+core/let-reference-undefined-01.xml
+core/let-reference-undefined-07.xml
+core/rule-abstract-02.xml
+
+# pattern and phase variables are global (as in the ISO skeleton), they do not shadow a schema variable of the same name
+core/let-scope-pattern-01.xml
+core/let-scope-phase-01.xml
+
+# sch:let with element content instead of @value, xsl:key with element content instead of @use
+core/let-value-element-content-01.xml
+core/xslt-key-element-content-01.xml
+
+# sch:pattern/@documents (subordinate documents, ISO 2016) is not supported
+core/pattern-subordinate-document-01.xml
+core/pattern-subordinate-document-02.xml
+
+# SVRL details: xml:lang of diagnostics, sch:name/@path, sch:properties and property-reference
+svrl/svrl-diagnostic-02.xml
+svrl/svrl-name-path-01.xml
+svrl/svrl-property-01.xml
+svrl/svrl-property-copy-of.xml

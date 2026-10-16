@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Schematron.Net</RootNamespace>
+    <PackageId>Schematron.Net</PackageId>
+    <Title>Schematron.Net – ISO Schematron for .NET</Title>
+    <Description>Validates XML documents with ISO Schematron schemas (query binding xslt2 / xslt3) from their .sch source, without Java or an XSLT processor: phases, includes, abstract patterns and rules, let, value-of, name, diagnostics, xsl:function and xsl:key, SVRL output. Runs the official EN 16931, XRechnung, Peppol and Factur-X rules with the same results as Saxon.</Description>
+    <PackageTags>schematron;svrl;xml;validation;xpath;en16931;xrechnung;peppol;factur-x;zugferd;e-invoice</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Schematron.Net.XPath\Schematron.Net.XPath.csproj" />
+  </ItemGroup>
+</Project>

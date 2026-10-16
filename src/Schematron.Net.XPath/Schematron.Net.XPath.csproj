@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Schematron.Net.XPath</RootNamespace>
+    <PackageId>Schematron.Net.XPath</PackageId>
+    <Title>Schematron.Net.XPath – XPath 2.0 for .NET</Title>
+    <Description>An XPath 2.0 engine for .NET with the XPath 3.0 operators let, ||, ! and =&gt;, the XSLT 2.0 functions (current, document, key, ...), xsl:function and xsl:key, and XSLT patterns. Follows the semantics of Saxon 12 (decimal arithmetic, rounding, comparisons of untyped values, XSD regular expressions). The XPath engine of Schematron.Net.</Description>
+    <PackageTags>xpath;xpath2;xpath-2.0;xdm;xml;xslt;schematron</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Schematron.Net.XPath.Tests" />
+  </ItemGroup>
+</Project>
