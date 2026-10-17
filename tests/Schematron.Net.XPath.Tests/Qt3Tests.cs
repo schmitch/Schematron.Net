@@ -45,6 +45,9 @@ namespace Schematron.Net.XPath.Tests
             "fn-round-half-to-even", "fn-starts-with", "fn-string", "fn-string-join", "fn-string-length", "fn-string-to-codepoints",
             "fn-subsequence", "fn-substring", "fn-substring-after", "fn-substring-before", "fn-sum", "fn-tokenize", "fn-translate",
             "fn-true", "fn-upper-case", "fn-zero-or-one", "fn-year-from-date", "fn-month-from-date", "fn-day-from-date",
+            // XPath 3.0 / 3.1 functions for messages and general schemas
+            "fn-format-integer", "fn-format-date", "fn-format-dateTime", "fn-format-time", "fn-sort", "fn-analyze-string",
+            "fn-adjust-dateTime-to-timezone", "fn-adjust-date-to-timezone", "fn-adjust-time-to-timezone",
             // operators
             "op-numeric-add", "op-numeric-subtract", "op-numeric-multiply", "op-numeric-divide", "op-numeric-integer-divide",
             "op-numeric-mod", "op-numeric-unary-minus", "op-numeric-unary-plus", "op-numeric-equal", "op-numeric-less-than",

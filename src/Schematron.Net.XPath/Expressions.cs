@@ -267,6 +267,7 @@ namespace Schematron.Net.XPath
             {
                 foreach (XdmItem item in input)
                 {
+                    context.CheckCancellation();
                     context.Locals[_Slot] = XdmValue.Of(item);
                     result.AddRange(_Return.Evaluate(context));
                 }
@@ -354,6 +355,7 @@ namespace Schematron.Net.XPath
             {
                 foreach (XdmItem item in input)
                 {
+                    context.CheckCancellation();
                     context.Locals[_Slot] = XdmValue.Of(item);
                     bool satisfied = _Satisfies.EffectiveBooleanValue(context);
                     if (satisfied != _Every)
@@ -472,11 +474,15 @@ namespace Schematron.Net.XPath
         private readonly Expr _Right;
 
 
-        public GeneralComparisonExpr(ComparisonOperator op, Expr left, Expr right)
+        private readonly bool _XPath1;
+
+
+        public GeneralComparisonExpr(ComparisonOperator op, Expr left, Expr right, bool xpath1 = false)
         {
             _Operator = op;
             _Left = left;
             _Right = right;
+            _XPath1 = xpath1;
         }
 
 
@@ -494,6 +500,10 @@ namespace Schematron.Net.XPath
 
         public override bool EffectiveBooleanValue(EvalContext context)
         {
+            if (_XPath1)
+            {
+                return XPath1Compatibility.GeneralCompare(_Left.Evaluate(context), _Operator, _Right.Evaluate(context));
+            }
             return Operations.GeneralCompare(_Left.Evaluate(context), _Operator, _Right.Evaluate(context));
         }
     }
@@ -667,11 +677,15 @@ namespace Schematron.Net.XPath
         private readonly Expr _Right;
 
 
-        public ArithmeticExpr(ArithmeticOperator op, Expr left, Expr right)
+        private readonly bool _XPath1;
+
+
+        public ArithmeticExpr(ArithmeticOperator op, Expr left, Expr right, bool xpath1 = false)
         {
             _Operator = op;
             _Left = left;
             _Right = right;
+            _XPath1 = xpath1;
         }
 
 
@@ -683,6 +697,10 @@ namespace Schematron.Net.XPath
 
         public override XdmValue Evaluate(EvalContext context)
         {
+            if (_XPath1)
+            {
+                return XPath1Compatibility.Arithmetic(_Left.Evaluate(context), _Operator, _Right.Evaluate(context));
+            }
             XdmAtomicValue a = Operations.AtomizeOptional(_Left.Evaluate(context), "the first operand of '" + _OperatorName + "'");
             if (a == null)
             {
@@ -726,9 +744,13 @@ namespace Schematron.Net.XPath
         private readonly Expr _Operand;
 
 
-        public UnaryMinusExpr(Expr operand)
+        private readonly bool _XPath1;
+
+
+        public UnaryMinusExpr(Expr operand, bool xpath1 = false)
         {
             _Operand = operand;
+            _XPath1 = xpath1;
         }
 
 
@@ -740,7 +762,9 @@ namespace Schematron.Net.XPath
 
         public override XdmValue Evaluate(EvalContext context)
         {
-            XdmAtomicValue a = Operations.AtomizeOptional(_Operand.Evaluate(context), "the operand of unary minus");
+            XdmAtomicValue a = _XPath1
+                ? XPath1Compatibility.ArithmeticOperand(_Operand.Evaluate(context)) ?? new DoubleValue(double.NaN)
+                : Operations.AtomizeOptional(_Operand.Evaluate(context), "the operand of unary minus");
             if (a == null)
             {
                 return XdmValue.Empty;
@@ -764,9 +788,13 @@ namespace Schematron.Net.XPath
         private readonly Expr _Operand;
 
 
-        public UnaryPlusExpr(Expr operand)
+        private readonly bool _XPath1;
+
+
+        public UnaryPlusExpr(Expr operand, bool xpath1 = false)
         {
             _Operand = operand;
+            _XPath1 = xpath1;
         }
 
 
@@ -778,7 +806,9 @@ namespace Schematron.Net.XPath
 
         public override XdmValue Evaluate(EvalContext context)
         {
-            XdmAtomicValue a = Operations.AtomizeOptional(_Operand.Evaluate(context), "the operand of unary plus");
+            XdmAtomicValue a = _XPath1
+                ? XPath1Compatibility.ArithmeticOperand(_Operand.Evaluate(context)) ?? new DoubleValue(double.NaN)
+                : Operations.AtomizeOptional(_Operand.Evaluate(context), "the operand of unary plus");
             if (a == null)
             {
                 return XdmValue.Empty;
@@ -1424,6 +1454,10 @@ namespace Schematron.Net.XPath
             {
                 for (int i = 0; i < size; i++)
                 {
+                    if ((i & 63) == 0)
+                    {
+                        context.CheckCancellation();
+                    }
                     context.ContextItem = nodes[i];
                     context.Position = i + 1;
                     context.Size = size;
@@ -1459,6 +1493,10 @@ namespace Schematron.Net.XPath
             {
                 for (int i = 0; i < size; i++)
                 {
+                    if ((i & 63) == 0)
+                    {
+                        context.CheckCancellation();
+                    }
                     context.ContextItem = items[i];
                     context.Position = i + 1;
                     context.Size = size;

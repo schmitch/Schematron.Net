@@ -3,8 +3,13 @@
 An XPath 2.0 engine for .NET. It is the XPath engine of
 [Schematron.Net](https://www.nuget.org/packages/Schematron.Net) and usable on its own.
 
-- **XPath 2.0** with the XPath 3.0 operators `let`, `||`, `!` and `=>`, all 13 axes, about 130
-  functions and the `xs:*` constructors.
+- **XPath 2.0** with the XPath 3.0 operators `let`, `||`, `!` and `=>`, all 13 axes, about 140
+  functions and the `xs:*` constructors, including `format-date` / `format-dateTime` /
+  `format-time` / `format-integer` (English and German names and words), `sort`, `analyze-string`
+  and `adjust-*-to-timezone`.
+- **XPath 1.0 compatibility mode** (`XPathStaticContext.XPath1CompatibilityMode`) for expressions
+  written for XPath 1.0: function arguments take the first item, arithmetic and comparisons convert
+  as XPath 1.0 does.
 - **Semantics of Saxon 12:**
   - `xs:decimal` arithmetic and `round()`
   - comparisons of untyped values with numbers
@@ -33,17 +38,20 @@ Console.WriteLine(result.Single().StringValue);
 Types:
 
 - **Data model:**
-  - `XdmDocument`
+  - `XdmDocument` (`Load` with `XdmLoadOptions`: the maximum nesting depth, 1000 by default)
   - `XdmNode` (read-only navigation: `Kind`, names, `Parent`, `Children`, `Attributes`, line numbers)
   - `XdmAtomicValue` (`TypeName`, `StringValue`)
-  - `XdmValue` (a sequence of items)
+  - `XdmValue` (a sequence of items; `XdmValue.Of` for strings, booleans, integers, decimals and doubles)
 - **Compiling:**
-  - `XPathStaticContext` (namespaces, base URI, `XPathFunctionLibrary` with `DeclareXslFunctions`)
-  - `XPathExpression.Compile` / `CompilePattern`
+  - `XPathStaticContext` (namespaces, base URI, XPath 1.0 compatibility mode, `XPathFunctionLibrary`
+    with `DeclareXslFunctions`)
+  - `XPathExpression.Compile` / `CompilePattern`; `VariableReferences` lists the variables an
+    expression uses, so a host can check that it declares them
   - `XPathSequenceType`
 - **Evaluating:**
   - `Evaluate` / `EvaluateBoolean` with a context item
-  - an optional `XPathDynamicContext` (documents for `doc()`, `XslKey`s for `key()`, global variables)
+  - an optional `XPathDynamicContext`: documents for `doc()`, `XslKey`s for `key()`, global variables,
+    a `CancellationToken` and the time limit of regular expressions (`RegexTimeout`, XPDY0130)
   - an optional `IXPathVariableResolver`
 - **Resources:** `IResourceResolver` opens what `doc()` / `document()` load; `DocumentCache` caches
   the parsed documents. The default `FileResourceResolver` only opens local files.
@@ -53,9 +61,8 @@ Errors are `XPathException`s with the W3C error code (`Code`).
 Not supported:
 
 - maps and arrays
-- higher-order functions
-- `format-date` and similar functions
-- collations
+- higher-order functions (function items, `sort` with a key function)
+- collations other than the codepoint collation
 - schema awareness
 
 The [W3C QT3 results](https://github.com/schmitch/Schematron.Net/blob/main/tests/Schematron.Net.XPath.Tests/TestData/qt3-known-failures.txt)

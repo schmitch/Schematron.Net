@@ -45,6 +45,7 @@ namespace Schematron.Net.XPath
             _RegisterSequences();
             _RegisterNodes();
             _RegisterDates();
+            _RegisterFormatting();
             _RegisterXslt();
             _RegisterMath();
             _RegisterConstructors();
@@ -131,6 +132,13 @@ namespace Schematron.Net.XPath
         private static string _String(XdmValue s)
         {
             return s.Count == 0 ? "" : ((XdmAtomicValue)s[0]).StringValue;
+        }
+
+
+        /// <summary>The string value of an optional argument, null for the empty sequence.</summary>
+        private static string _OptionalString(XdmValue[] args, int index)
+        {
+            return args.Length > index && args[index].Count > 0 ? ((XdmAtomicValue)args[index][0]).StringValue : null;
         }
 
 
@@ -328,6 +336,57 @@ namespace Schematron.Net.XPath
 
 
         // --------------------------------------------------------------------------------------------------------
+        // formatting, sorting and regular expression analysis (XPath 3.0 / 3.1)
+        // --------------------------------------------------------------------------------------------------------
+
+        private static void _RegisterFormatting()
+        {
+            _Fn("format-integer", 2, 3, ResultKind.String, (c, a, f) =>
+            {
+                if (a[0].Count == 0)
+                {
+                    return XdmValue.Of("");
+                }
+                return XdmValue.Of(Formatting.FormatInteger(((IntegerValue)a[0][0]).Value, _String(a[1]), _OptionalString(a, 2)));
+            }, "xs:integer?", "xs:string", "xs:string?");
+
+            foreach (KeyValuePair<string, string> function in new[]
+                     {
+                         new KeyValuePair<string, string>("format-date", "xs:date?"),
+                         new KeyValuePair<string, string>("format-dateTime", "xs:dateTime?"),
+                         new KeyValuePair<string, string>("format-time", "xs:time?")
+                     })
+            {
+                char kind = function.Key == "format-date" ? 'D' : function.Key == "format-time" ? 'T' : 'B';
+                FunctionImplementation implementation = (c, a, f) =>
+                {
+                    if (a[0].Count == 0)
+                    {
+                        return XdmValue.Empty;
+                    }
+                    return XdmValue.Of(Formatting.FormatDateTime((CalendarValue)a[0][0], _String(a[1]), _OptionalString(a, 2), _OptionalString(a, 3), _OptionalString(a, 4), kind));
+                };
+                // the arities 2 and 5 (not 3 and 4)
+                _Fn(function.Key, 2, 2, ResultKind.String, implementation, function.Value, "xs:string");
+                _Fn(function.Key, 5, 5, ResultKind.String, implementation, function.Value, "xs:string", "xs:string?", "xs:string?", "xs:string?");
+            }
+
+            _Fn("sort", 1, 2, ResultKind.Unknown, (c, a, f) => SequenceFunctions.Sort(a[0], _OptionalString(a, 1)), "item()*", "xs:string?");
+
+            _Fn("analyze-string", 2, 3, ResultKind.Nodes, (c, a, f) =>
+            {
+                string flags = a.Length > 2 ? _String(a[2]) : "";
+                Regex regex = XPathRegex.Get(_String(a[1]), flags, c.Environment.RegexTimeout);
+                if (regex.IsMatch(""))
+                {
+                    throw new XPathException("FORX0003", "The regular expression in analyze-string() matches a zero-length string");
+                }
+                return XdmValue.Of(SequenceFunctions.AnalyzeString(_String(a[0]), _String(a[1]), flags, regex));
+            }, "xs:string?", "xs:string", "xs:string");
+        }
+
+
+        // --------------------------------------------------------------------------------------------------------
         // numeric functions
         // --------------------------------------------------------------------------------------------------------
 
@@ -344,7 +403,7 @@ namespace Schematron.Net.XPath
                 {
                     value = (XdmAtomicValue)a[0].First;
                 }
-                return XdmValue.Of(new DoubleValue(_NumberOf(value)));
+                return XdmValue.Of(new DoubleValue(XPath1Compatibility.Number(value)));
             }, "xs:anyAtomicType?");
 
             _Fn("abs", 1, 1, ResultKind.Numeric, (c, a, f) =>
@@ -391,28 +450,6 @@ namespace Schematron.Net.XPath
                 int precision = a.Length > 1 ? (int)((IntegerValue)a[1][0]).Value : 0;
                 return XdmValue.Of(_Round(n, precision, true));
             }, "xs:anyAtomicType?", "xs:integer");
-        }
-
-
-        private static double _NumberOf(XdmAtomicValue value)
-        {
-            if (value == null)
-            {
-                return double.NaN;
-            }
-            switch (value)
-            {
-                case NumericValue n:
-                    return n.ToDouble();
-                case BooleanValue b:
-                    return b.Value ? 1 : 0;
-            }
-            XdmAtomicValue result;
-            if (Casting.TryCast(value, XsType.Double, out result) == null)
-            {
-                return ((DoubleValue)result).Value;
-            }
-            return double.NaN;
         }
 
 
@@ -706,13 +743,13 @@ namespace Schematron.Net.XPath
 
             _Fn("matches", 2, 3, ResultKind.Boolean, (c, a, f) =>
             {
-                Regex regex = XPathRegex.Get(_String(a[1]), a.Length > 2 ? _String(a[2]) : "");
+                Regex regex = XPathRegex.Get(_String(a[1]), a.Length > 2 ? _String(a[2]) : "", c.Environment.RegexTimeout);
                 return XdmValue.Of(regex.IsMatch(_String(a[0])));
             }, "xs:string?", "xs:string", "xs:string");
 
             _Fn("replace", 3, 4, ResultKind.String, (c, a, f) =>
             {
-                Regex regex = XPathRegex.Get(_String(a[1]), a.Length > 3 ? _String(a[3]) : "");
+                Regex regex = XPathRegex.Get(_String(a[1]), a.Length > 3 ? _String(a[3]) : "", c.Environment.RegexTimeout);
                 if (regex.IsMatch(""))
                 {
                     throw new XPathException("FORX0003", "The regular expression in replace() matches a zero-length string");
@@ -736,7 +773,7 @@ namespace Schematron.Net.XPath
                 {
                     return XdmValue.Empty;
                 }
-                Regex regex = XPathRegex.Get(_String(a[1]), a.Length > 2 ? _String(a[2]) : "");
+                Regex regex = XPathRegex.Get(_String(a[1]), a.Length > 2 ? _String(a[2]) : "", c.Environment.RegexTimeout);
                 if (regex.IsMatch(""))
                 {
                     throw new XPathException("FORX0003", "The regular expression in tokenize() matches a zero-length string");
@@ -1123,40 +1160,72 @@ namespace Schematron.Net.XPath
         }
 
 
-        private static bool _DeepEqualNodes(XdmNode a, XdmNode b)
+        /// <summary>
+        /// Compares two trees; iterative (with a stack of node pairs still to compare), so deep trees cannot exhaust
+        /// the call stack.
+        /// </summary>
+        private static bool _DeepEqualNodes(XdmNode first, XdmNode second)
         {
-            if (a.Kind != b.Kind)
+            Stack<KeyValuePair<XdmNode, XdmNode>> pending = new Stack<KeyValuePair<XdmNode, XdmNode>>();
+            pending.Push(new KeyValuePair<XdmNode, XdmNode>(first, second));
+            while (pending.Count > 0)
             {
-                return false;
-            }
-            switch (a.Kind)
-            {
-                case XdmNodeKind.Element:
-                    if (a.LocalName != b.LocalName || a.NamespaceUri != b.NamespaceUri || a.AttributeNodes.Length != b.AttributeNodes.Length)
-                    {
-                        return false;
-                    }
-                    foreach (XdmNode attribute in a.AttributeNodes)
-                    {
-                        if (b.GetAttribute(attribute.LocalName, attribute.NamespaceUri) != attribute.Value)
+                KeyValuePair<XdmNode, XdmNode> pair = pending.Pop();
+                XdmNode a = pair.Key;
+                XdmNode b = pair.Value;
+                if (a.Kind != b.Kind)
+                {
+                    return false;
+                }
+                switch (a.Kind)
+                {
+                    case XdmNodeKind.Element:
+                        if (a.LocalName != b.LocalName || a.NamespaceUri != b.NamespaceUri || a.AttributeNodes.Length != b.AttributeNodes.Length)
                         {
                             return false;
                         }
-                    }
-                    return _DeepEqualChildren(a, b);
-                case XdmNodeKind.Document:
-                    return _DeepEqualChildren(a, b);
-                case XdmNodeKind.Attribute:
-                case XdmNodeKind.ProcessingInstruction:
-                case XdmNodeKind.Namespace:
-                    return a.LocalName == b.LocalName && a.NamespaceUri == b.NamespaceUri && a.StringValue == b.StringValue;
-                default:
-                    return a.StringValue == b.StringValue;
+                        foreach (XdmNode attribute in a.AttributeNodes)
+                        {
+                            if (b.GetAttribute(attribute.LocalName, attribute.NamespaceUri) != attribute.Value)
+                            {
+                                return false;
+                            }
+                        }
+                        if (!_PushChildren(a, b, pending))
+                        {
+                            return false;
+                        }
+                        break;
+                    case XdmNodeKind.Document:
+                        if (!_PushChildren(a, b, pending))
+                        {
+                            return false;
+                        }
+                        break;
+                    case XdmNodeKind.Attribute:
+                    case XdmNodeKind.ProcessingInstruction:
+                    case XdmNodeKind.Namespace:
+                        if (a.LocalName != b.LocalName || a.NamespaceUri != b.NamespaceUri || a.StringValue != b.StringValue)
+                        {
+                            return false;
+                        }
+                        break;
+                    default:
+                        if (a.StringValue != b.StringValue)
+                        {
+                            return false;
+                        }
+                        break;
+                }
             }
+            return true;
         }
 
 
-        private static bool _DeepEqualChildren(XdmNode a, XdmNode b)
+        /// <summary>
+        /// Pairs the element and text children of two nodes for comparison; false if their numbers differ.
+        /// </summary>
+        private static bool _PushChildren(XdmNode a, XdmNode b, Stack<KeyValuePair<XdmNode, XdmNode>> pending)
         {
             List<XdmNode> ca = a.ChildNodes.Where(n => n.Kind == XdmNodeKind.Element || n.Kind == XdmNodeKind.Text).ToList();
             List<XdmNode> cb = b.ChildNodes.Where(n => n.Kind == XdmNodeKind.Element || n.Kind == XdmNodeKind.Text).ToList();
@@ -1164,12 +1233,9 @@ namespace Schematron.Net.XPath
             {
                 return false;
             }
-            for (int i = 0; i < ca.Count; i++)
+            for (int i = ca.Count - 1; i >= 0; i--)
             {
-                if (!_DeepEqualNodes(ca[i], cb[i]))
-                {
-                    return false;
-                }
+                pending.Push(new KeyValuePair<XdmNode, XdmNode>(ca[i], cb[i]));
             }
             return true;
         }
@@ -1366,6 +1432,37 @@ namespace Schematron.Net.XPath
                 return XdmValue.Of(new CalendarValue(XsType.DateTime, date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second, date.TimezoneMinutes ?? time.TimezoneMinutes));
             }, "xs:date?", "xs:time?");
 
+            foreach (KeyValuePair<string, string> function in new[]
+                     {
+                         new KeyValuePair<string, string>("adjust-dateTime-to-timezone", "xs:dateTime?"),
+                         new KeyValuePair<string, string>("adjust-date-to-timezone", "xs:date?"),
+                         new KeyValuePair<string, string>("adjust-time-to-timezone", "xs:time?")
+                     })
+            {
+                _Fn(function.Key, 1, 2, ResultKind.Unknown, (c, a, f) =>
+                {
+                    if (a[0].Count == 0)
+                    {
+                        return XdmValue.Empty;
+                    }
+                    int? timezone = Operations.ImplicitTimezoneMinutes;
+                    if (a.Length > 1)
+                    {
+                        timezone = null;
+                        if (a[1].Count > 0)
+                        {
+                            DurationValue duration = (DurationValue)a[1][0];
+                            if (duration.Seconds % 60 != 0 || Math.Abs(duration.Seconds) > 14 * 3600)
+                            {
+                                throw new XPathException("FODT0003", "Invalid timezone " + duration.StringValue + " (whole minutes between -PT14H and PT14H)");
+                            }
+                            timezone = (int)(duration.Seconds / 60);
+                        }
+                    }
+                    return XdmValue.Of(_AdjustToTimezone((CalendarValue)a[0][0], timezone));
+                }, function.Value, "xs:dayTimeDuration?");
+            }
+
             _Component("year-from-dateTime", "xs:dateTime?", v => IntegerValue.Get(((CalendarValue)v).Year));
             _Component("month-from-dateTime", "xs:dateTime?", v => IntegerValue.Get(((CalendarValue)v).Month));
             _Component("day-from-dateTime", "xs:dateTime?", v => IntegerValue.Get(((CalendarValue)v).Day));
@@ -1387,6 +1484,37 @@ namespace Schematron.Net.XPath
             _Component("hours-from-duration", "xs:duration?", v => IntegerValue.Get((long)Math.Truncate(((DurationValue)v).Seconds % 86400 / 3600)));
             _Component("minutes-from-duration", "xs:duration?", v => IntegerValue.Get((long)Math.Truncate(((DurationValue)v).Seconds % 3600 / 60)));
             _Component("seconds-from-duration", "xs:duration?", v => new DecimalValue(((DurationValue)v).Seconds % 60));
+        }
+
+
+        /// <summary>
+        /// fn:adjust-*-to-timezone: null removes the timezone; a value without timezone gets the timezone; otherwise
+        /// the value is converted to the same instant in the new timezone (a date as its start, a time on any day).
+        /// </summary>
+        private static CalendarValue _AdjustToTimezone(CalendarValue value, int? timezone)
+        {
+            if (!timezone.HasValue || !value.TimezoneMinutes.HasValue)
+            {
+                return new CalendarValue(value.Type, value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second, timezone);
+            }
+            bool time = value.Type.Primitive == PrimitiveType.Time;
+            long days = time ? CalendarMath.DaysFromCivil(1972, 12, 31) : CalendarMath.DaysFromCivil(value.Year, value.Month, value.Day);
+            long minutes = days * 1440 + value.Hour * 60 + value.Minute + (timezone.Value - value.TimezoneMinutes.Value);
+            long newDays = minutes >= 0 ? minutes / 1440 : (minutes - 1439) / 1440;
+            int minuteOfDay = (int)(minutes - newDays * 1440);
+            int year;
+            int month;
+            int day;
+            CalendarMath.CivilFromDays(newDays, out year, out month, out day);
+            if (time)
+            {
+                return new CalendarValue(value.Type, value.Year, value.Month, value.Day, minuteOfDay / 60, minuteOfDay % 60, value.Second, timezone);
+            }
+            if (value.Type.Primitive == PrimitiveType.Date)
+            {
+                return new CalendarValue(value.Type, year, month, day, 0, 0, 0, timezone);
+            }
+            return new CalendarValue(value.Type, year, month, day, minuteOfDay / 60, minuteOfDay % 60, value.Second, timezone);
         }
 
 

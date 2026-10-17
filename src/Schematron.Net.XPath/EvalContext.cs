@@ -18,6 +18,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Schematron.Net.XPath
 {
@@ -81,6 +82,26 @@ namespace Schematron.Net.XPath
 
         /// <summary>The global variables: used when an evaluation gets no variables, and by the key definitions.</summary>
         public IXPathVariableResolver GlobalVariables { get; set; }
+
+        /// <summary>
+        /// Stops long evaluations: checked while predicates, for and quantified expressions and function calls are
+        /// evaluated. A cancelled evaluation throws an <see cref="OperationCanceledException"/>.
+        /// </summary>
+        public CancellationToken CancellationToken { get; set; }
+
+        /// <summary>
+        /// The time limit of one match of a regular expression (matches(), replace(), tokenize()); a match that takes
+        /// longer raises XPDY0130. Default: 10 seconds.
+        /// </summary>
+        public TimeSpan RegexTimeout
+        {
+            get => _RegexTimeout;
+            set => _RegexTimeout = value > TimeSpan.Zero || value == Timeout.InfiniteTimeSpan
+                ? value
+                : throw new ArgumentOutOfRangeException(nameof(value), "The regular expression timeout must be positive or infinite");
+        }
+
+        private TimeSpan _RegexTimeout = TimeSpan.FromSeconds(10);
     }
 
 
@@ -137,6 +158,15 @@ namespace Schematron.Net.XPath
         public EvalContext(XPathDynamicContext environment)
         {
             Environment = environment;
+        }
+
+
+        /// <summary>
+        /// Throws an <see cref="OperationCanceledException"/> if the evaluation was cancelled.
+        /// </summary>
+        public void CheckCancellation()
+        {
+            Environment.CancellationToken.ThrowIfCancellationRequested();
         }
 
 

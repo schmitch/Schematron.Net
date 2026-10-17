@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Schematron.Net.XPath;
 
 namespace Schematron.Net
 {
@@ -41,10 +42,11 @@ namespace Schematron.Net
     /// </summary>
     public sealed class SchematronDiagnostic
     {
-        internal SchematronDiagnostic(string id, string text)
+        internal SchematronDiagnostic(string id, string text, string language)
         {
             Id = id;
             Text = text;
+            Language = language;
         }
 
 
@@ -53,6 +55,41 @@ namespace Schematron.Net
 
         /// <summary>The text of the diagnostic.</summary>
         public string Text { get; }
+
+        /// <summary>The xml:lang of the sch:diagnostic, null if it has none.</summary>
+        public string Language { get; }
+    }
+
+
+    /// <summary>
+    /// A property referenced by an assertion (sch:property, svrl:property-reference).
+    /// </summary>
+    public sealed class SchematronPropertyReference
+    {
+        internal SchematronPropertyReference(string id, string role, string scheme, string text, IReadOnlyList<XdmNode> nodes)
+        {
+            Id = id;
+            Role = role;
+            Scheme = scheme;
+            Text = text;
+            Nodes = nodes;
+        }
+
+
+        /// <summary>The id of the sch:property.</summary>
+        public string Id { get; }
+
+        /// <summary>The role attribute of the property.</summary>
+        public string Role { get; }
+
+        /// <summary>The scheme attribute of the property.</summary>
+        public string Scheme { get; }
+
+        /// <summary>The text of the property (with sch:value-of and sch:name evaluated).</summary>
+        public string Text { get; }
+
+        /// <summary>The nodes selected by the xsl:copy-of elements of the property, copied into the SVRL output.</summary>
+        public IReadOnlyList<XdmNode> Nodes { get; }
     }
 
 
@@ -93,6 +130,9 @@ namespace Schematron.Net
         /// <summary>The message text of the assertion (with sch:value-of and sch:name evaluated).</summary>
         public string Text { get; internal set; }
 
+        /// <summary>The xml:lang of the assertion, null if it has none.</summary>
+        public string Language { get; internal set; }
+
         /// <summary>
         /// The location of the node the assertion failed for, as XPath in the notation of SchXslt and the KoSIT
         /// validator, e.g. /Q{urn:...:Invoice-2}Invoice[1]/Q{urn:...}AccountingSupplierParty[1].
@@ -105,6 +145,12 @@ namespace Schematron.Net
         /// <summary>Column of the node in the validated document (if known).</summary>
         public int? LinePosition { get; internal set; }
 
+        /// <summary>
+        /// The URI of the document the node belongs to: the validated document, or a subordinate document of
+        /// sch:pattern/@documents. Null if unknown.
+        /// </summary>
+        public string DocumentUri { get; internal set; }
+
         /// <summary>The id of the pattern the assertion belongs to.</summary>
         public string PatternId { get; internal set; }
 
@@ -113,6 +159,9 @@ namespace Schematron.Net
 
         /// <summary>The diagnostics referenced by the assertion.</summary>
         public IReadOnlyList<SchematronDiagnostic> Diagnostics { get; internal set; } = new SchematronDiagnostic[0];
+
+        /// <summary>The properties referenced by the assertion.</summary>
+        public IReadOnlyList<SchematronPropertyReference> Properties { get; internal set; } = new SchematronPropertyReference[0];
 
 
         /// <inheritdoc/>
@@ -128,10 +177,11 @@ namespace Schematron.Net
     /// </summary>
     public sealed class SchematronActivePattern
     {
-        internal SchematronActivePattern(string id, string name)
+        internal SchematronActivePattern(string id, string name, IReadOnlyList<string> documents)
         {
             Id = id;
             Name = name;
+            Documents = documents;
         }
 
 
@@ -140,6 +190,60 @@ namespace Schematron.Net
 
         /// <summary>The name (title) of the pattern.</summary>
         public string Name { get; }
+
+        /// <summary>
+        /// The URIs of the subordinate documents the pattern validated (sch:pattern/@documents); empty if it
+        /// validated the document itself.
+        /// </summary>
+        public IReadOnlyList<string> Documents { get; }
+    }
+
+
+    /// <summary>
+    /// A dynamic error that occurred while evaluating a rule, reported instead of thrown with
+    /// <see cref="SchematronDynamicErrorHandling.Report"/>.
+    /// </summary>
+    public sealed class SchematronError
+    {
+        internal SchematronError(string code, string message, string patternId, string ruleContext, string assertionId, string location, string documentUri)
+        {
+            Code = code;
+            Message = message;
+            PatternId = patternId;
+            RuleContext = ruleContext;
+            AssertionId = assertionId;
+            Location = location;
+            DocumentUri = documentUri;
+        }
+
+
+        /// <summary>The XPath / XSLT error code, e.g. FORG0001.</summary>
+        public string Code { get; }
+
+        /// <summary>The description of the error, with pattern, rule and location.</summary>
+        public string Message { get; }
+
+        /// <summary>The pattern that was evaluated.</summary>
+        public string PatternId { get; }
+
+        /// <summary>The context of the rule that was evaluated; null for an error in sch:pattern/@documents.</summary>
+        public string RuleContext { get; }
+
+        /// <summary>The id of the assertion that was evaluated, null for an error in a rule context or variable.</summary>
+        public string AssertionId { get; }
+
+        /// <summary>The location of the context node in the notation of SchXslt.</summary>
+        public string Location { get; }
+
+        /// <summary>The URI of the document of the context node, null if unknown.</summary>
+        public string DocumentUri { get; }
+
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return Message;
+        }
     }
 
 
@@ -148,11 +252,13 @@ namespace Schematron.Net
     /// </summary>
     internal sealed class SchematronFiredRule
     {
-        public SchematronFiredRule(string patternId, string ruleId, string context, int firstMessage)
+        public SchematronFiredRule(string patternId, string ruleId, string context, string flag, string role, int firstMessage)
         {
             PatternId = patternId;
             RuleId = ruleId;
             Context = context;
+            Flag = flag;
+            Role = role;
             FirstMessage = firstMessage;
         }
 
@@ -162,6 +268,10 @@ namespace Schematron.Net
         public string RuleId { get; }
 
         public string Context { get; }
+
+        public string Flag { get; }
+
+        public string Role { get; }
 
         public int FirstMessage { get; }
     }
@@ -178,13 +288,16 @@ namespace Schematron.Net
         private readonly IReadOnlyList<SchematronFiredRule> _FiredRules;
 
 
-        internal SchematronResult(string title, string schemaVersion, IReadOnlyList<KeyValuePair<string, string>> namespaces, IReadOnlyList<SchematronActivePattern> activePatterns, IReadOnlyList<SchematronMessage> messages, IReadOnlyList<SchematronFiredRule> firedRules)
+        internal SchematronResult(string title, string schemaVersion, string phase, IReadOnlyList<KeyValuePair<string, string>> namespaces, IReadOnlyList<SchematronActivePattern> activePatterns,
+                                  IReadOnlyList<SchematronMessage> messages, IReadOnlyList<SchematronError> errors, IReadOnlyList<SchematronFiredRule> firedRules)
         {
             Title = title;
             SchemaVersion = schemaVersion;
+            Phase = phase;
             Namespaces = namespaces;
             ActivePatterns = activePatterns;
             Messages = messages;
+            Errors = errors;
             _FiredRules = firedRules;
         }
 
@@ -195,6 +308,9 @@ namespace Schematron.Net
         /// <summary>The schemaVersion of the Schematron schema.</summary>
         public string SchemaVersion { get; }
 
+        /// <summary>The phase that was validated: a phase id or #ALL.</summary>
+        public string Phase { get; }
+
         /// <summary>The namespaces declared with sch:ns.</summary>
         public IReadOnlyList<KeyValuePair<string, string>> Namespaces { get; }
 
@@ -203,6 +319,20 @@ namespace Schematron.Net
 
         /// <summary>The failed assertions and successful reports in the order SchXslt reports them.</summary>
         public IReadOnlyList<SchematronMessage> Messages { get; }
+
+        /// <summary>
+        /// The dynamic errors of the rules, with <see cref="SchematronDynamicErrorHandling.Report"/> (otherwise the
+        /// first error is thrown and this list is empty).
+        /// </summary>
+        public IReadOnlyList<SchematronError> Errors { get; }
+
+        /// <summary>
+        /// True if no assertion failed and no dynamic error was reported (ISO Schematron validity: a successful
+        /// report does not make a document invalid). Warnings are failed assertions too; filter
+        /// <see cref="FailedAssertions"/> by <see cref="SchematronMessage.Flag"/> or <see cref="SchematronMessage.Role"/>
+        /// to ignore them.
+        /// </summary>
+        public bool IsValid => Errors.Count == 0 && !FailedAssertions.Any();
 
         /// <summary>How many times a rule fired.</summary>
         public int FiredRuleCount => _FiredRules.Count;
@@ -228,6 +358,10 @@ namespace Schematron.Net
             {
                 root.SetAttributeValue("schemaVersion", SchemaVersion);
             }
+            if (Phase != null && Phase != "#ALL")
+            {
+                root.SetAttributeValue("phase", Phase);
+            }
             foreach (KeyValuePair<string, string> ns in Namespaces)
             {
                 root.Add(new XElement(_Svrl + "ns-prefix-in-attribute-values", new XAttribute("prefix", ns.Key), new XAttribute("uri", ns.Value)));
@@ -245,6 +379,10 @@ namespace Schematron.Net
                 {
                     active.SetAttributeValue("name", pattern.Name);
                 }
+                if (pattern.Documents.Count > 0)
+                {
+                    active.SetAttributeValue("documents", String.Join(" ", pattern.Documents));
+                }
                 root.Add(active);
                 List<int> firings;
                 if (!firingsByPattern.TryGetValue(pattern.Id ?? "", out firings))
@@ -256,6 +394,8 @@ namespace Schematron.Net
                     SchematronFiredRule firedRule = _FiredRules[i];
                     XElement fired = new XElement(_Svrl + "fired-rule", new XAttribute("context", firedRule.Context ?? ""));
                     fired.SetAttributeValue("id", firedRule.RuleId);
+                    fired.SetAttributeValue("flag", firedRule.Flag);
+                    fired.SetAttributeValue("role", firedRule.Role);
                     root.Add(fired);
                     int end = i + 1 < _FiredRules.Count ? _FiredRules[i + 1].FirstMessage : Messages.Count;
                     for (int m = firedRule.FirstMessage; m < end; m++)
@@ -281,9 +421,40 @@ namespace Schematron.Net
             element.SetAttributeValue("test", message.Test);
             foreach (SchematronDiagnostic diagnostic in message.Diagnostics)
             {
-                element.Add(new XElement(_Svrl + "diagnostic-reference", new XAttribute("diagnostic", diagnostic.Id), new XElement(_Svrl + "text", diagnostic.Text)));
+                element.Add(new XElement(_Svrl + "diagnostic-reference", new XAttribute("diagnostic", diagnostic.Id), _Text(diagnostic.Text, diagnostic.Language)));
             }
-            element.Add(new XElement(_Svrl + "text", message.Text));
+            foreach (SchematronPropertyReference property in message.Properties)
+            {
+                XElement text = _Text(property.Text, null);
+                foreach (XdmNode node in property.Nodes)
+                {
+                    if (node.Kind == XdmNodeKind.Attribute)
+                    {
+                        if (text.Attribute(XName.Get(node.LocalName, node.NamespaceUri)) == null)
+                        {
+                            text.Add(new XAttribute(XName.Get(node.LocalName, node.NamespaceUri), node.StringValue));
+                        }
+                        continue;
+                    }
+                    text.Add(NodeCopy.ToXNodes(node));
+                }
+                XElement reference = new XElement(_Svrl + "property-reference", new XAttribute("property", property.Id), text);
+                reference.SetAttributeValue("role", property.Role);
+                reference.SetAttributeValue("scheme", property.Scheme);
+                element.Add(reference);
+            }
+            element.Add(_Text(message.Text, message.Language));
+            return element;
+        }
+
+
+        private static XElement _Text(string text, string language)
+        {
+            XElement element = new XElement(_Svrl + "text", text);
+            if (language != null)
+            {
+                element.SetAttributeValue(XNamespace.Xml + "lang", language);
+            }
             return element;
         }
     }

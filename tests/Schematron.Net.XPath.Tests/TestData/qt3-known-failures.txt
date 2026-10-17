@@ -70,12 +70,11 @@ fn-deep-equal/fn-deep-equal-maps-10  # error XPST0003 (XPST0003: Expected ')' bu
 fn-deep-equal/fn-deep-equal-maps-13  # error XPST0003 (XPST0003: Expected ')' but found { at position 26 in expression "\u000A        fn:deep-equal(map{"a":1}, map{"A":1}, \u000A            'http://www.w3.org/...
 fn-deep-equal/fn-deep-equal-maps-14  # error XPST0003 (XPST0003: Expected ')' but found { at position 26 in expression "\u000A        fn:deep-equal(map{1:"a"}, map{1:"A"}, \u000A            'http://www.w3.org/...
 fn-deep-equal/fn-deep-equal-maps-15  # error XPST0003 (XPST0003: Expected ')' but found { at position 26 in expression "\u000A        fn:deep-equal(map{1:"A"}, map:remove(map{1:"A", 2:"B"}, 2))\u000A      "), ...
-fn-deep-equal/fn-deep-equal-maps-16  # error XPST0017 (XPST0017: Unknown function adjust-dateTime-to-timezone#2 in expression "\u000A        let $t := xs:dateTime('2014-10-14T11:31:12') return\u000A        let...
-fn-deep-equal/fn-deep-equal-maps-17  # error XPST0017 (XPST0017: Unknown function adjust-dateTime-to-timezone#2 in expression "\u000A        let $t := xs:dateTime('2014-10-14T11:31:12') return\u000A        let...
+fn-deep-equal/fn-deep-equal-maps-16  # error XPST0003 (XPST0003: Expected ')' but found { at position 164 in expression "\u000A        let $t := xs:dateTime('2014-10-14T11:31:12') return\u000A        let $u :=...
+fn-deep-equal/fn-deep-equal-maps-17  # error XPST0003 (XPST0003: Expected ')' but found { at position 191 in expression "\u000A        let $t := xs:dateTime('2014-10-14T11:31:12') return\u000A        let $u :=...
 fn-distinct-values/fn-distinct-values-mixed-args-005  # assert-permutation 1, 0 does not hold for (xs:double("0"), xs:integer("1"))
 fn-distinct-values/fn-distinct-values-mixed-args-012  # assert-string-value 1.2 does not hold for (xs:decimal("1.2"), xs:float("1.2"))
 fn-distinct-values/K2-SeqDistinctValuesFunc-1  # expected error FOCH0002, got (xs:string("1"), xs:string("2"), xs:string("3"))
-fn-distinct-values/cbcl-distinct-values-003  # error XPST0017 (XPST0017: Unknown function adjust-dateTime-to-timezone#1 in expression "distinct-values(\u000A              (xs:dateTime("2008-01-01T13:00:00"),\u000A    ...
 fn-ends-with/fn-ends-with-19  # assert-true  does not hold for (xs:boolean("false"))
 fn-ends-with/fn-ends-with-20  # assert-true  does not hold for (xs:boolean("false"))
 fn-ends-with/fn-ends-with-24  # assert-true  does not hold for (xs:boolean("false"))
@@ -325,6 +324,15 @@ fn-substring-before/fn-substring-before-37  # assert-eq "dâta" does not hold fo
 fn-substring-before/K-SubstringBeforeFunc-4  # expected error FOCH0002, got (xs:string(""))
 fn-sum/fn-sum-11  # error XPST0003 (XPST0003: Unexpected token [ at position 4 in expression "sum([1,2,3,4,5])"), expected assert-eq 15
 fn-upper-case/fn-upper-case-22  # assert-deep-eq 1348, 1341 does not hold for (xs:integer("64279"))
+fn-sort/fn-sort-17  # error XPST0003 (XPST0003: Unexpected token [ at position 21 in expression "\u000A          let $a := [xs:float("NaN"), 1],     \u000A          $b := [xs:float("NaN"), 2]\u000A...
+fn-sort/fn-sort-18  # error XPST0003 (XPST0003: Unexpected token [ at position 13 in expression "fn:sort( (1, [1, 2]) )"), expected assert-deep-eq (1, [1, 2])
+fn-sort/fn-sort-19  # error XPST0003 (XPST0003: Unexpected token [ at position 10 in expression "fn:sort( ([1, 2], 1) )"), expected assert-deep-eq (1, [1, 2])
+fn-sort/fn-sort-20  # error XPST0003 (XPST0003: Unexpected token [ at position 10 in expression "fn:sort( ([()], 1) )"), expected assert-deep-eq ([()], 1)
+fn-sort/fn-sort-21  # error XPST0003 (XPST0003: Unexpected token [ at position 13 in expression "fn:sort( (1, [()]) )"), expected assert-deep-eq ([()], 1)
+fn-adjust-dateTime-to-timezone/cbcl-adjust-dateTime-to-timezone-002  # expected error FODT0001, got error FORG0001
+fn-adjust-dateTime-to-timezone/cbcl-adjust-dateTime-to-timezone-003  # expected error FODT0001, got error FORG0001
+fn-adjust-date-to-timezone/cbcl-adjust-date-to-timezone-002  # expected error FODT0001, got error FORG0001
+fn-adjust-date-to-timezone/cbcl-adjust-date-to-timezone-003  # expected error FODT0001, got error FORG0001
 op-numeric-divide/K-NumericDivide-37  # expected error XPST0003, got (xs:decimal("3.333333333333333333"))
 op-numeric-integer-divide/K-NumericIntegerDivide-43  # expected error XPST0003, got (xs:integer("3"))
 op-numeric-mod/K-NumericMod-22  # expected error XPST0003, got (xs:integer("1"))
@@ -366,8 +374,6 @@ prod-FunctionCall/FunctionCall-012  # expected error XPTY0004, got error XPST001
 prod-FunctionCall/FunctionCall-027  # expected error XPST0051, got error XPST0003
 prod-FunctionCall/K-FunctionCallExpr-11  # expected error XPST0017, got error FODC0002
 prod-FunctionCall/K-FunctionCallExpr-14  # expected error XPST0017, got error XTDE1260
-prod-FunctionCall/K-FunctionCallExpr-16a  # error XPST0017 (XPST0017: Unknown function format-time#2 in expression "matches(format-time(current-time(), "[H01]:[m01]"), "[0-2][0-9]:[0-5][0-9]")"), expected...
-prod-FunctionCall/K-FunctionCallExpr-17a  # error XPST0017 (XPST0017: Unknown function format-time#5 in expression "matches(format-time(current-time(), "[H01]:[m01]", (), (), ()), "..:..")"), expected ass...
 prod-FunctionCall/K-FunctionCallExpr-22  # expected error XPST0017, got error XTDE1360
 prod-FunctionCall/K-FunctionCallExpr-26  # expected error XPST0017, got (xs:string("envisia GmbH"))
 prod-FunctionCall/K2-FunctionCallExpr-3  # expected error XPST0017, got error XTDE1360

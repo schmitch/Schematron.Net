@@ -303,6 +303,163 @@ namespace Schematron.Net.XPath.Tests
         }
 
 
+        private static string _Nested(int depth)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < depth; i++)
+            {
+                sb.Append("<n>");
+            }
+            sb.Append("<leaf>t</leaf>");
+            for (int i = 0; i < depth; i++)
+            {
+                sb.Append("</n>");
+            }
+            return sb.ToString();
+        }
+
+
+        [TestMethod]
+        public void NestingDepthIsLimited()
+        {
+            // the document element has depth 1: 999 n elements and the leaf are 1000 levels
+            Assert.AreEqual(1000, new XdmLoadOptions().MaxDepth);
+            Assert.AreEqual(1001, _Load(_Nested(999)).Root.Descendants().Count());
+            XmlException e = Assert.Throws<XmlException>(() => _Load(_Nested(1000)));
+            StringAssert.Contains(e.Message, "1000");
+
+            XdmLoadOptions shallow = new XdmLoadOptions { MaxDepth = 3 };
+            Assert.Throws<XmlException>(() => XdmDocument.Load(new MemoryStream(Encoding.UTF8.GetBytes(_Nested(3))), null, shallow));
+            Assert.AreEqual(4, XdmDocument.Load(new MemoryStream(Encoding.UTF8.GetBytes(_Nested(2))), null, shallow).Root.Descendants().Count());
+            using (XmlReader reader = XmlReader.Create(new StringReader(_Nested(3))))
+            {
+                Assert.Throws<XmlException>(() => XdmDocument.Load(reader, shallow));
+            }
+            Assert.Throws<ArgumentOutOfRangeException>(() => new XdmLoadOptions { MaxDepth = -1 });
+        }
+
+
+        /// <summary>
+        /// Without a depth limit, the functions that walk a tree (string value, deep-equal, descendants, path) must not
+        /// exhaust the stack: a stack overflow ends the process.
+        /// </summary>
+        [TestMethod]
+        public void DeepTreesDoNotExhaustTheStack()
+        {
+            XdmDocument document = XdmDocument.Load(new MemoryStream(Encoding.UTF8.GetBytes(_Nested(100000))), null, new XdmLoadOptions { MaxDepth = 0 });
+            string[]? results = null;
+            Exception? error = null;
+            Thread thread = new Thread(() =>
+            {
+                try
+                {
+                    results = _Strings(XPathExpression.Compile("string(/), deep-equal(/, /), count(//leaf/ancestor::*), string-length(path(//leaf))").Evaluate(document.Root));
+                    results = results.Append(document.Root.Descendants().Count().ToString()).ToArray();
+                }
+                catch (Exception e)
+                {
+                    error = e;
+                }
+            }, 1024 * 1024);
+            thread.Start();
+            thread.Join();
+            Assert.IsNull(error, error?.ToString());
+            CollectionAssert.AreEqual(new[] { "t", "true", "100000", "800011", "100002" }, results, string.Join(", ", results!));
+        }
+
+
+        [TestMethod]
+        public void XPath1CompatibilityMode()
+        {
+            XdmDocument document = _Load("<r><v>2</v><v>10</v><s>abc</s></r>");
+            XPathStaticContext xpath1 = new XPathStaticContext { XPath1CompatibilityMode = true };
+            string[] holds =
+            {
+                "count(//v) = '2'", "'1' + 1 = 2", "//v + 1 = 3", "-//v = -2", "substring('abcde', '2', '3') = 'bcd'", "contains(//v, '2')",
+                "string-length(//v) = 1", "//v = true()", "1 = true()", "0 = false()", "'abc' = //s", "//v > '5'", "not(//v > '20')",
+                "round('2.5') = 3", "floor('2.7') = 2", "() + 1 != () + 1"
+            };
+            foreach (string expression in holds)
+            {
+                Assert.IsTrue(XPathExpression.Compile(expression, xpath1).EvaluateBoolean(document.Root), expression);
+            }
+            // arithmetic on an empty operand is NaN, numbers are doubles
+            CollectionAssert.AreEqual(new[] { "NaN" }, _Strings(XPathExpression.Compile("//missing + 1", xpath1).Evaluate(document.Root)));
+            Assert.AreEqual("xs:double", ((XdmAtomicValue)XPathExpression.Compile("1 + 2", xpath1).Evaluate(document.Root)[0]).TypeName);
+
+            // XPath 2.0: type errors and empty sequences
+            Assert.AreEqual("XPTY0004", Assert.ThrowsExactly<XPathException>(() => XPathExpression.Compile("count(//v) = '2'").EvaluateBoolean(document.Root)).Code);
+            Assert.AreEqual("XPTY0004", Assert.ThrowsExactly<XPathException>(() => XPathExpression.Compile("contains(//v, '2')").EvaluateBoolean(document.Root)).Code);
+            Assert.IsTrue(XPathExpression.Compile("//missing + 1").Evaluate(document.Root).IsEmpty);
+        }
+
+
+        [TestMethod]
+        public void VariableReferences()
+        {
+            XPathStaticContext context = new XPathStaticContext(new Dictionary<string, string> { ["p"] = "urn:p" });
+            XPathExpression expression = XPathExpression.Compile("for $i in $items return $i + $p:offset + $items[1]", context);
+            CollectionAssert.AreEqual(new[] { "items", "{urn:p}offset" }, expression.VariableReferences.ToArray());
+            CollectionAssert.AreEqual(new[] { "x" }, XPathExpression.CompilePattern("item[@id = $x]", context).VariableReferences.ToArray());
+            Assert.IsEmpty(XPathExpression.Compile("let $a := 1 return $a").VariableReferences);
+        }
+
+
+        [TestMethod]
+        public void EvaluationsCanBeCancelled()
+        {
+            using CancellationTokenSource cancelled = new CancellationTokenSource();
+            cancelled.Cancel();
+            XPathDynamicContext context = new XPathDynamicContext { CancellationToken = cancelled.Token };
+            Assert.ThrowsExactly<OperationCanceledException>(() => XPathExpression.Compile("some $i in 1 to 10 satisfies $i = 10").EvaluateBoolean(null, context));
+            Assert.ThrowsExactly<OperationCanceledException>(() => XPathExpression.Compile("(1 to 10)[. = 10]").Evaluate(null, context));
+        }
+
+
+        [TestMethod]
+        public void RegularExpressionsHaveATimeLimit()
+        {
+            XPathDynamicContext context = new XPathDynamicContext { RegexTimeout = TimeSpan.FromMilliseconds(50) };
+            XPathExpression slow = XPathExpression.Compile("matches('" + new string('a', 40) + "!', '^(a+)+$')");
+            Assert.AreEqual("XPDY0130", Assert.ThrowsExactly<XPathException>(() => slow.EvaluateBoolean(null, context)).Code);
+            Assert.IsTrue(XPathExpression.Compile("matches('abc', '^a')").EvaluateBoolean(null, context));
+            Assert.AreEqual(TimeSpan.FromSeconds(10), new XPathDynamicContext().RegexTimeout);
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new XPathDynamicContext { RegexTimeout = TimeSpan.FromSeconds(-1) });
+        }
+
+
+        [TestMethod]
+        public void FormattingSortingAndRegularExpressionAnalysis()
+        {
+            string[] results = _Strings(XPathExpression.Compile("""
+                format-date(xs:date('2024-03-05'), '[D1o] [MNn] [Y]', 'en', (), ()),
+                format-date(xs:date('2024-03-05'), '[FNn], [D]. [MNn] [Y]', 'de', (), ()),
+                format-dateTime(xs:dateTime('2024-03-05T14:07:09.5+01:00'), '[Y0001]-[M01]-[D01] [h]:[m01] [PN] [Z]'),
+                format-integer(1234567, '#,##0'),
+                format-integer(21, 'Ww', 'de'),
+                string-join(sort((3, 1, 2)) ! string(), ','),
+                count(analyze-string('a1b22', '\d+')/fn:match),
+                adjust-dateTime-to-timezone(xs:dateTime('2024-03-05T23:30:00Z'), xs:dayTimeDuration('PT2H'))
+                """).Evaluate(null));
+            CollectionAssert.AreEqual(new[]
+            {
+                "5th March 2024", "Dienstag, 5. März 2024", "2024-03-05 2:07 PM +01:00", "1,234,567", "Einundzwanzig", "1,2,3", "2", "2024-03-06T01:30:00+02:00"
+            }, results, string.Join(" | ", results));
+        }
+
+
+        [TestMethod]
+        public void NumericValues()
+        {
+            Variables variables = new Variables();
+            variables.Values["i"] = XdmValue.Of(42L);
+            variables.Values["d"] = XdmValue.Of(1.5m);
+            variables.Values["f"] = XdmValue.Of(0.5);
+            XdmValue result = XPathExpression.Compile("$i instance of xs:integer, $d instance of xs:decimal, $f instance of xs:double, $i + $d + $f").Evaluate(null, null, variables);
+            CollectionAssert.AreEqual(new[] { "true", "true", "true", "44" }, _Strings(result));
+        }
+
+
         /// <summary>
         /// The public surface of the package: a change here is a change of the API.
         /// </summary>
@@ -314,7 +471,7 @@ namespace Schematron.Net.XPath.Tests
             {
                 "DocumentCache", "FileResourceResolver", "IDocumentResolver", "IResourceResolver", "IXPathVariableResolver",
                 "XPathDynamicContext", "XPathException", "XPathExpression", "XPathFunctionLibrary", "XPathSequenceType", "XPathStaticContext",
-                "XdmAtomicValue", "XdmDocument", "XdmItem", "XdmNode", "XdmNodeKind", "XdmValue", "XslKey"
+                "XdmAtomicValue", "XdmDocument", "XdmItem", "XdmLoadOptions", "XdmNode", "XdmNodeKind", "XdmValue", "XslKey"
             }, types, string.Join(", ", types));
         }
     }

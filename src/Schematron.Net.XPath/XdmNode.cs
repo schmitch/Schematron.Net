@@ -133,12 +133,13 @@ namespace Schematron.Net.XPath
         /// </summary>
         public IEnumerable<XdmNode> Descendants()
         {
-            foreach (XdmNode child in ChildNodes)
+            // the subtree is the range Order + 1 .. EndOrder of the document's nodes
+            XdmNode[] all = Document.AllNodes;
+            for (int i = Order + 1; i <= EndOrder && i < all.Length; i++)
             {
-                yield return child;
-                foreach (XdmNode descendant in child.Descendants())
+                if (all[i].Kind != XdmNodeKind.Attribute)
                 {
-                    yield return descendant;
+                    yield return all[i];
                 }
             }
         }
@@ -177,25 +178,17 @@ namespace Schematron.Net.XPath
             {
                 return ChildNodes[0].Value;
             }
+            // the descendant text nodes in document order: the range Order + 1 .. EndOrder of the document's nodes
             StringBuilder sb = new StringBuilder();
-            _AppendText(this, sb);
-            return sb.ToString();
-        }
-
-
-        private static void _AppendText(XdmNode node, StringBuilder sb)
-        {
-            foreach (XdmNode child in node.ChildNodes)
+            XdmNode[] all = Document.AllNodes;
+            for (int i = Order + 1; i <= EndOrder && i < all.Length; i++)
             {
-                if (child.Kind == XdmNodeKind.Text)
+                if (all[i].Kind == XdmNodeKind.Text)
                 {
-                    sb.Append(child.Value);
-                }
-                else if (child.Kind == XdmNodeKind.Element)
-                {
-                    _AppendText(child, sb);
+                    sb.Append(all[i].Value);
                 }
             }
+            return sb.ToString();
         }
 
 
@@ -378,8 +371,20 @@ namespace Schematron.Net.XPath
         /// <summary>
         /// Parses an XML file.
         /// </summary>
-        /// <exception cref="XmlException">The document is not well-formed or has a document type declaration</exception>
+        /// <exception cref="XmlException">The document is not well-formed, has a document type declaration or is nested too deeply</exception>
         public static XdmDocument Load(string path)
+        {
+            return Load(path, null);
+        }
+
+
+        /// <summary>
+        /// Parses an XML file.
+        /// </summary>
+        /// <param name="path">The file</param>
+        /// <param name="options">Limits; null for the defaults</param>
+        /// <exception cref="XmlException">The document is not well-formed, has a document type declaration or exceeds a limit</exception>
+        public static XdmDocument Load(string path, XdmLoadOptions options)
         {
             if (path == null)
             {
@@ -387,8 +392,21 @@ namespace Schematron.Net.XPath
             }
             using (FileStream stream = File.OpenRead(path))
             {
-                return XdmDocumentBuilder.Load(stream, ResourceLoader.FileUri(path));
+                return XdmDocumentBuilder.Load(stream, ResourceLoader.FileUri(path), _MaxDepth(options));
             }
+        }
+
+
+        /// <summary>
+        /// Parses an XML document from a stream. Document type declarations are rejected, external resources are
+        /// never loaded and the nesting depth is limited, so untrusted input can be parsed safely.
+        /// </summary>
+        /// <param name="stream">The XML document</param>
+        /// <param name="documentUri">The URI the document was read from, null if unknown</param>
+        /// <exception cref="XmlException">The document is not well-formed, has a document type declaration or is nested too deeply</exception>
+        public static XdmDocument Load(Stream stream, string documentUri = null)
+        {
+            return Load(stream, documentUri, null);
         }
 
 
@@ -398,14 +416,15 @@ namespace Schematron.Net.XPath
         /// </summary>
         /// <param name="stream">The XML document</param>
         /// <param name="documentUri">The URI the document was read from, null if unknown</param>
-        /// <exception cref="XmlException">The document is not well-formed or has a document type declaration</exception>
-        public static XdmDocument Load(Stream stream, string documentUri = null)
+        /// <param name="options">Limits; null for the defaults</param>
+        /// <exception cref="XmlException">The document is not well-formed, has a document type declaration or exceeds a limit</exception>
+        public static XdmDocument Load(Stream stream, string documentUri, XdmLoadOptions options)
         {
             if (stream == null)
             {
                 throw new ArgumentNullException(nameof(stream));
             }
-            return XdmDocumentBuilder.Load(stream, documentUri);
+            return XdmDocumentBuilder.Load(stream, documentUri, _MaxDepth(options));
         }
 
 
@@ -414,14 +433,33 @@ namespace Schematron.Net.XPath
         /// handled; whitespace-only text nodes must not be ignored by the reader if the rules depend on them.
         /// </summary>
         /// <param name="reader">The reader, positioned at the start of the document</param>
-        /// <exception cref="XmlException">The document is not well-formed</exception>
+        /// <exception cref="XmlException">The document is not well-formed or is nested too deeply</exception>
         public static XdmDocument Load(XmlReader reader)
+        {
+            return Load(reader, null);
+        }
+
+
+        /// <summary>
+        /// Builds the document from an XML reader. The reader's settings decide how DTDs and external resources are
+        /// handled; whitespace-only text nodes must not be ignored by the reader if the rules depend on them.
+        /// </summary>
+        /// <param name="reader">The reader, positioned at the start of the document</param>
+        /// <param name="options">Limits; null for the defaults</param>
+        /// <exception cref="XmlException">The document is not well-formed or exceeds a limit</exception>
+        public static XdmDocument Load(XmlReader reader, XdmLoadOptions options)
         {
             if (reader == null)
             {
                 throw new ArgumentNullException(nameof(reader));
             }
-            return XdmDocumentBuilder.Load(reader, String.IsNullOrEmpty(reader.BaseURI) ? null : reader.BaseURI);
+            return XdmDocumentBuilder.Load(reader, String.IsNullOrEmpty(reader.BaseURI) ? null : reader.BaseURI, _MaxDepth(options));
+        }
+
+
+        private static int _MaxDepth(XdmLoadOptions options)
+        {
+            return options?.MaxDepth ?? XdmLoadOptions.DefaultMaxDepth;
         }
 
 
@@ -511,6 +549,29 @@ namespace Schematron.Net.XPath
                 return (_Local.GetHashCode() * 397) ^ _Namespace.GetHashCode();
             }
         }
+    }
+
+
+    /// <summary>
+    /// Limits for parsing XML documents (<see cref="XdmDocument.Load(Stream, string, XdmLoadOptions)"/>).
+    /// </summary>
+    public sealed class XdmLoadOptions
+    {
+        /// <summary>The default of <see cref="MaxDepth"/>.</summary>
+        public const int DefaultMaxDepth = 1000;
+
+
+        /// <summary>
+        /// The maximum nesting depth of elements (the document element has depth 1); a deeper document is rejected
+        /// with an <see cref="XmlException"/>. 0 for no limit. Default: 1000.
+        /// </summary>
+        public int MaxDepth
+        {
+            get => _MaxDepth;
+            set => _MaxDepth = value >= 0 ? value : throw new ArgumentOutOfRangeException(nameof(value), "The maximum depth must not be negative");
+        }
+
+        private int _MaxDepth = DefaultMaxDepth;
     }
 
 
