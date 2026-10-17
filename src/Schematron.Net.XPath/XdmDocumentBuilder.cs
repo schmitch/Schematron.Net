@@ -47,16 +47,20 @@ namespace Schematron.Net.XPath
         }
 
 
-        public static XdmDocument Load(Stream stream, string documentUri)
+        public static XdmDocument Load(Stream stream, string documentUri, int maxDepth = XdmLoadOptions.DefaultMaxDepth)
         {
             using (XmlReader reader = XmlReader.Create(stream, CreateSecureSettings(), documentUri))
             {
-                return Load(reader, documentUri);
+                return Load(reader, documentUri, maxDepth);
             }
         }
 
 
-        public static XdmDocument Load(XmlReader reader, string documentUri)
+        /// <summary>
+        /// Builds the tree. Elements nested more deeply than maxDepth (0: no limit) are rejected, so that the
+        /// functions that walk a tree cannot exhaust the stack.
+        /// </summary>
+        public static XdmDocument Load(XmlReader reader, string documentUri, int maxDepth = XdmLoadOptions.DefaultMaxDepth)
         {
             XdmDocument document = new XdmDocument(documentUri);
             List<XdmNode> allNodes = new List<XdmNode>();
@@ -116,9 +120,10 @@ namespace Schematron.Net.XPath
                     case XmlNodeType.CDATA:
                     case XmlNodeType.Whitespace:
                     case XmlNodeType.SignificantWhitespace:
-                        if (openNodes.Count == 1)
+                        if (openNodes.Count == 1 && (reader.NodeType == XmlNodeType.Whitespace || reader.NodeType == XmlNodeType.SignificantWhitespace))
                         {
-                            // whitespace outside of the document element is not part of the data model
+                            // whitespace outside of the document element is not part of the data model (other text
+                            // only occurs there when a fragment is read)
                             break;
                         }
                         if (pendingText == null)
@@ -133,6 +138,12 @@ namespace Schematron.Net.XPath
                     case XmlNodeType.Element:
                         {
                             FlushText();
+                            // the open containers are the document node and the ancestors of this element
+                            if (maxDepth > 0 && openNodes.Count > maxDepth)
+                            {
+                                throw new XmlException("The elements are nested more than " + maxDepth + " levels deep",
+                                                       null, hasLineInfo ? lineInfo.LineNumber : 0, hasLineInfo ? lineInfo.LinePosition : 0);
+                            }
                             XdmNode element = new XdmNode(XdmNodeKind.Element, document)
                             {
                                 LocalName = reader.LocalName,

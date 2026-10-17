@@ -82,11 +82,16 @@ namespace Schematron.Net.XPath
         public readonly XPathStaticContext StaticContext;
 
 
+        /// <summary>The call was compiled in XPath 1.0 compatibility mode.</summary>
+        private readonly bool _XPath1;
+
+
         public FunctionCallExpr(FunctionDefinition function, Expr[] arguments, XPathStaticContext staticContext)
         {
             Function = function;
             Arguments = arguments;
             StaticContext = staticContext;
+            _XPath1 = staticContext.XPath1CompatibilityMode;
         }
 
 
@@ -109,13 +114,25 @@ namespace Schematron.Net.XPath
             {
                 XdmValue value = Arguments[i].Evaluate(context);
                 XPathSequenceType type = Function.GetParameterType(i);
+                if (_XPath1)
+                {
+                    value = XPath1Compatibility.ConvertArgument(value, type, Function, i);
+                }
                 if (type != null)
                 {
                     value = type.Convert(value, _ArgumentRole(i));
                 }
                 arguments[i] = value;
             }
-            return Function.Implementation(context, arguments, this);
+            try
+            {
+                return Function.Implementation(context, arguments, this);
+            }
+            catch (System.Text.RegularExpressions.RegexMatchTimeoutException e)
+            {
+                throw new XPathException("XPDY0130", "The regular expression '" + e.Pattern + "' in " + Function.LocalName + "() did not finish within "
+                                         + e.MatchTimeout.TotalSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture) + " s", e);
+            }
         }
 
 
@@ -204,6 +221,7 @@ namespace Schematron.Net.XPath
                 arguments[i] = value;
             }
 
+            context.CheckCancellation();
             if (context.CallDepth > _MaxDepth)
             {
                 throw new XPathException("XTDE0000", "Too many nested function calls (infinite recursion?) in " + Function.LocalName + "()");

@@ -30,18 +30,19 @@ namespace Schematron.Net.XPath
     internal static class XPathRegex
     {
         private static readonly ConcurrentDictionary<string, Regex> _Cache = new ConcurrentDictionary<string, Regex>();
-        private static readonly TimeSpan _Timeout = TimeSpan.FromSeconds(10);
-
-
-        public static Regex Get(string pattern, string flags)
+        /// <summary>
+        /// Returns the compiled regular expression; a match that takes longer than the timeout throws a
+        /// <see cref="RegexMatchTimeoutException"/> (reported as XPDY0130 by the function call).
+        /// </summary>
+        public static Regex Get(string pattern, string flags, TimeSpan timeout)
         {
-            string key = flags + "\u0001" + pattern;
+            string key = timeout.Ticks + "\u0001" + flags + "\u0001" + pattern;
             Regex regex;
             if (_Cache.TryGetValue(key, out regex))
             {
                 return regex;
             }
-            regex = _Compile(pattern, flags);
+            regex = _Compile(pattern, flags, timeout);
             if (_Cache.Count < 2000)
             {
                 _Cache[key] = regex;
@@ -50,7 +51,7 @@ namespace Schematron.Net.XPath
         }
 
 
-        private static Regex _Compile(string pattern, string flags)
+        private static Regex _Compile(string pattern, string flags, TimeSpan timeout)
         {
             RegexOptions options = RegexOptions.CultureInvariant;
             bool dotAll = false;
@@ -84,7 +85,7 @@ namespace Schematron.Net.XPath
             string translated = literal ? Regex.Escape(pattern) : Translate(pattern, dotAll, multiLine, ignoreWhitespace);
             try
             {
-                return new Regex(translated, options, _Timeout);
+                return new Regex(translated, options, timeout);
             }
             catch (ArgumentException e)
             {

@@ -77,6 +77,27 @@ namespace Schematron.Net.XPath
         }
 
 
+        /// <summary>An xs:integer.</summary>
+        public static XdmValue Of(long value)
+        {
+            return new XdmValue(new XdmItem[] { IntegerValue.Get(value) }, 1);
+        }
+
+
+        /// <summary>An xs:decimal.</summary>
+        public static XdmValue Of(decimal value)
+        {
+            return new XdmValue(new XdmItem[] { new DecimalValue(value) }, 1);
+        }
+
+
+        /// <summary>An xs:double.</summary>
+        public static XdmValue Of(double value)
+        {
+            return new XdmValue(new XdmItem[] { new DoubleValue(value) }, 1);
+        }
+
+
         /// <summary>An xs:string.</summary>
         public static XdmValue Of(string value)
         {

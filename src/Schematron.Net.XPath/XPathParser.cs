@@ -67,6 +67,14 @@ namespace Schematron.Net.XPath
         /// <summary>The default namespace of element names in paths, "" for none.</summary>
         public string DefaultElementNamespace { get; set; } = "";
 
+        /// <summary>
+        /// XPath 1.0 compatibility mode (XPath 2.0, 3.1.5, 3.4, 3.5.2), for expressions written for XPath 1.0: a
+        /// function parameter that takes one item gets the first item of the argument (converted with fn:string() or
+        /// fn:number() for string and numeric parameters), arithmetic converts its operands to xs:double, and general
+        /// comparisons compare numbers and strings as XPath 1.0 does. Applies to the expressions compiled afterwards.
+        /// </summary>
+        public bool XPath1CompatibilityMode { get; set; }
+
         /// <summary>The static base URI, null if unknown.</summary>
         public string BaseUri { get; }
 
@@ -120,6 +128,9 @@ namespace Schematron.Net.XPath
 
         public int SlotCount { get; private set; }
 
+        /// <summary>The expanded names of the variables referenced but not bound inside the expression.</summary>
+        public readonly HashSet<string> ExternalReferences = new HashSet<string>(StringComparer.Ordinal);
+
 
         public int Declare(string expandedName)
         {
@@ -160,16 +171,24 @@ namespace Schematron.Net.XPath
         internal readonly int SlotCount;
 
 
-        internal XPathExpression(string text, Expr root, int slotCount)
+        internal XPathExpression(string text, Expr root, int slotCount, IEnumerable<string> variableReferences = null)
         {
             Text = text;
             Root = root;
             SlotCount = slotCount;
+            VariableReferences = variableReferences == null ? new string[0] : variableReferences.OrderBy(n => n, StringComparer.Ordinal).ToArray();
         }
 
 
         /// <summary>The source of the expression.</summary>
         public string Text { get; }
+
+
+        /// <summary>
+        /// The variables the expression references but does not bind itself (expanded names as passed to
+        /// <see cref="IXPathVariableResolver.TryResolve"/>): a host language can check that it declares them.
+        /// </summary>
+        public IReadOnlyList<string> VariableReferences { get; }
 
 
         /// <summary>
@@ -186,7 +205,7 @@ namespace Schematron.Net.XPath
             }
             CompileScope scope = new CompileScope();
             Expr root = XPathParser.Parse(text, staticContext ?? new XPathStaticContext(), scope);
-            return new XPathExpression(text, root, scope.SlotCount);
+            return new XPathExpression(text, root, scope.SlotCount, scope.ExternalReferences);
         }
 
 
@@ -203,7 +222,7 @@ namespace Schematron.Net.XPath
             }
             CompileScope scope = new CompileScope();
             Expr root = XPathParser.ParsePattern(pattern, staticContext ?? new XPathStaticContext(), scope);
-            return new XPathExpression(pattern, root, scope.SlotCount);
+            return new XPathExpression(pattern, root, scope.SlotCount, scope.ExternalReferences);
         }
 
 
@@ -673,22 +692,22 @@ namespace Schematron.Net.XPath
                 {
                     case "=":
                         _Next();
-                        return new GeneralComparisonExpr(ComparisonOperator.Equal, left, _ParseStringConcat());
+                        return new GeneralComparisonExpr(ComparisonOperator.Equal, left, _ParseStringConcat(), _Static.XPath1CompatibilityMode);
                     case "!=":
                         _Next();
-                        return new GeneralComparisonExpr(ComparisonOperator.NotEqual, left, _ParseStringConcat());
+                        return new GeneralComparisonExpr(ComparisonOperator.NotEqual, left, _ParseStringConcat(), _Static.XPath1CompatibilityMode);
                     case "<":
                         _Next();
-                        return new GeneralComparisonExpr(ComparisonOperator.LessThan, left, _ParseStringConcat());
+                        return new GeneralComparisonExpr(ComparisonOperator.LessThan, left, _ParseStringConcat(), _Static.XPath1CompatibilityMode);
                     case "<=":
                         _Next();
-                        return new GeneralComparisonExpr(ComparisonOperator.LessOrEqual, left, _ParseStringConcat());
+                        return new GeneralComparisonExpr(ComparisonOperator.LessOrEqual, left, _ParseStringConcat(), _Static.XPath1CompatibilityMode);
                     case ">":
                         _Next();
-                        return new GeneralComparisonExpr(ComparisonOperator.GreaterThan, left, _ParseStringConcat());
+                        return new GeneralComparisonExpr(ComparisonOperator.GreaterThan, left, _ParseStringConcat(), _Static.XPath1CompatibilityMode);
                     case ">=":
                         _Next();
-                        return new GeneralComparisonExpr(ComparisonOperator.GreaterOrEqual, left, _ParseStringConcat());
+                        return new GeneralComparisonExpr(ComparisonOperator.GreaterOrEqual, left, _ParseStringConcat(), _Static.XPath1CompatibilityMode);
                     case "<<":
                     case ">>":
                         _Next();
@@ -763,12 +782,12 @@ namespace Schematron.Net.XPath
                 if (_IsSymbol("+"))
                 {
                     _Next();
-                    left = new ArithmeticExpr(ArithmeticOperator.Add, left, _ParseMultiplicative());
+                    left = new ArithmeticExpr(ArithmeticOperator.Add, left, _ParseMultiplicative(), _Static.XPath1CompatibilityMode);
                 }
                 else if (_IsSymbol("-"))
                 {
                     _Next();
-                    left = new ArithmeticExpr(ArithmeticOperator.Subtract, left, _ParseMultiplicative());
+                    left = new ArithmeticExpr(ArithmeticOperator.Subtract, left, _ParseMultiplicative(), _Static.XPath1CompatibilityMode);
                 }
                 else
                 {
@@ -805,7 +824,7 @@ namespace Schematron.Net.XPath
                     return left;
                 }
                 _Next();
-                left = new ArithmeticExpr(op, left, _ParseUnion());
+                left = new ArithmeticExpr(op, left, _ParseUnion(), _Static.XPath1CompatibilityMode);
             }
         }
 
@@ -937,7 +956,7 @@ namespace Schematron.Net.XPath
             {
                 return operand;
             }
-            return minus % 2 == 1 ? new UnaryMinusExpr(operand) : (Expr)new UnaryPlusExpr(operand);
+            return minus % 2 == 1 ? new UnaryMinusExpr(operand, _Static.XPath1CompatibilityMode) : (Expr)new UnaryPlusExpr(operand, _Static.XPath1CompatibilityMode);
         }
 
 
@@ -1425,6 +1444,7 @@ namespace Schematron.Net.XPath
                                 {
                                     return new LocalVariableExpr(slot, name);
                                 }
+                                _Scope.ExternalReferences.Add(name);
                                 return new ExternalVariableExpr(name);
                             }
                         case "(":
